@@ -18,18 +18,18 @@
 </head>
 <body>
 
-  <!-- Parol Kirish Qismi -->
+  <!-- 1. Kirish Qismi (Parol: 84maktab) -->
   <div id="loginSection" class="login-box">
     <h3 style="color: var(--color-gold-300); margin-bottom: 20px;">🔒 Maxfiy Kirish</h3>
-    <input type="password" id="adminPassword" placeholder="Maxfiy parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center; outline: none;">
+    <input type="password" id="adminPassword" placeholder="Parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center; outline: none;">
     <button type="button" onclick="verifyAdmin()" class="btn btn-primary" style="width: 100%;">Kirish</button>
     <p id="loginError" style="color: #ff4d4d; margin-top: 12px; font-size: 0.9rem; display: none;">❌ Parol noto'g'ri!</p>
   </div>
 
-  <!-- Boshqaruv Paneli -->
+  <!-- 2. Asosiy Boshqaruv Paneli -->
   <div id="adminPanel" class="admin-container" style="display: none;">
     <h2>🛠️ 84-Maktab Boshqaruv Paneli</h2>
-    <p style="text-align: center; margin-bottom: 25px; color: #cbd5e1;">Bu yerdan kiritilgan ustozlar ma'lumotlari to'g'ridan-to'g'ri Supabase bazasiga yoziladi.</p>
+    <p style="text-align: center; margin-bottom: 25px; color: #cbd5e1;">Bu yerdan kiritilgan ustozlar ma'lumotlari to'g'ridan-to'g'ri Supabase bazasiga saqlanadi.</p>
     
     <form id="addTeacherForm">
       <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">➕ Yangi Ustoz Qo'shish</h3>
@@ -59,7 +59,8 @@
   </div>
 
   <script>
-    const MY_SECRET_PASSWORD = "84maktab_super_admin_2026"; // O'z parolingiz
+    // 🔑 Parol endi aniq "84maktab" qilib qo'yildi
+    const MY_SECRET_PASSWORD = "84maktab";
 
     function verifyAdmin() {
       const inputPass = document.getElementById('adminPassword').value;
@@ -84,9 +85,9 @@
       location.reload();
     }
 
-    // Supabase ulanishi
+    // Supabase ulanishi (O'z kalitlaringizni shu yerga yozasiz)
     const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'z anon keyingiz
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
