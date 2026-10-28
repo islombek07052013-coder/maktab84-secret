@@ -43,7 +43,6 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(212, 175, 55, 0.2); font-size: 0.9rem; }
     th { color: var(--color-gold-300); background: rgba(0,0,0,0.5); }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -68,7 +67,7 @@
       </div>
       <div class="form-group">
         <label>Fani / Lavozimi:</label>
-        <input type="text" id="tSubject" placeholder="Masalan: Maktab Direktori yoki Fizika o'qituvchisi" required>
+        <input type="text" id="tSubject" placeholder="Masalan: Maktab Direktori" required>
       </div>
       <div class="form-group">
         <label>Ma'lumot (Bio):</label>
@@ -78,7 +77,7 @@
     </form>
 
     <div style="margin-top: 25px;">
-      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Bazadagi Ustozlar va Rahbariyat (O'chirish uchun)</h4>
+      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Ustozlar va Rahbariyat Ro'yxati (O'chirish uchun)</h4>
       <div id="adminTeachersList">Yuklanmoqda...</div>
     </div>
 
@@ -88,7 +87,7 @@
         <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini Qo'shish / O'zgartirish</h3>
         <div class="form-group">
           <label>Sinf:</label>
-          <input type="text" id="sClass" placeholder="Masalan: 5-A sinf" required>
+          <input type="text" id="sClass" placeholder="Masalan: 1-A sinf" required>
         </div>
         <div class="form-group">
           <label>Hafta kuni:</label>
@@ -109,7 +108,7 @@
       </form>
 
       <div style="margin-top: 25px;">
-        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Barcha Sinflarning Dars Jadvallari (Ko'rinib turishi va O'chirish uchun)</h4>
+        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Barcha Sinflarning Dars Jadvallari</h4>
         <div id="adminScheduleList">Yuklanmoqda...</div>
       </div>
     </div>
@@ -145,9 +144,35 @@
 
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
-    const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'z kalitingizni yozing
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Ma'lumotlarni brauzer xotirasida (localStorage) saqlash tizimi
+    function getStoredTeachers() {
+      const data = localStorage.getItem('school_teachers');
+      if (!data) {
+        const defaults = [
+          { id: 1, full_name: "Alisher Karimov", subject: "Maktab Direktori", bio: "Oliy ma'lumotli rahbar." },
+          { id: 2, full_name: "Dilshod Rahimov", subject: "Matematika o'qituvchisi", bio: "Oliy toifali ustoz." },
+          { id: 3, full_name: "Malika Tosheva", subject: "Ona tili va adabiyot", bio: "Tajribali o'qituvchi." },
+          { id: 4, full_name: "Zarnigor Umarova", subject: "Ingliz tili o'qituvchisi", bio: "IELTS 7.5 egasi." }
+        ];
+        localStorage.setItem('school_teachers', JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(data);
+    }
+
+    function getStoredSchedules() {
+      const data = localStorage.getItem('school_schedules');
+      if (!data) {
+        const defaults = [
+          { id: 1, class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, O'qish, Jismoniy tarbiya" },
+          { id: 2, class_name: "5-A sinf", day: "Dushanba", lessons: "Matematika, Ona tili, Ingliz tili, Tarix" },
+          { id: 3, class_name: "6-A sinf", day: "Dushanba", lessons: "Fizika, Algebra, Ingliz tili, Ona tili" }
+        ];
+        localStorage.setItem('school_schedules', JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(data);
+    }
 
     function loadAdminData() {
       loadAdminTeachers();
@@ -155,39 +180,32 @@
     }
 
     // Ustoz qo'shish
-    document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
+    document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const { error } = await supabaseClient.from('teachers').insert([{
+      const teachers = getStoredTeachers();
+      const newTeacher = {
+        id: Date.now(),
         full_name: document.getElementById('tName').value,
         subject: document.getElementById('tSubject').value,
         bio: document.getElementById('tBio').value
-      }]);
-      if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
+      };
+      teachers.push(newTeacher);
+      localStorage.setItem('school_teachers', JSON.stringify(teachers));
+      alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
+      document.getElementById('addTeacherForm').reset();
+      loadAdminTeachers();
     });
 
-    // Ustozlarni chiqarish (Agar baza bo'sh bo'lsa, avtomatik to'liq ro'yxatni kiritib ko'rsatadi)
-    async function loadAdminTeachers() {
+    // Ustozlarni chiqarish
+    function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
-      let { data: teachers } = await supabaseClient.from('teachers').select('*');
+      const teachers = getStoredTeachers();
       
-      if (!teachers || teachers.length === 0) {
-        // Avtomatik boshlang'ich ustozlarni bazaga kiritib yuboramiz
-        await supabaseClient.from('teachers').insert([
-          { full_name: "Alisher Karimov", subject: "Maktab Direktori", bio: "Oliy ma'lumotli rahbar." },
-          { full_name: "Dilshod Rahimov", subject: "Matematika o'qituvchisi", bio: "Oliy toifali ustoz." },
-          { full_name: "Malika Tosheva", subject: "Ona tili va adabiyot", bio: "Tajribali o'qituvchi." },
-          { full_name: "Zarnigor Umarova", subject: "Ingliz tili o'qituvchisi", bio: "IELTS 7.5 egasi." }
-        ]);
-        let { data: newT } = await supabaseClient.from('teachers').select('*');
-        teachers = newT;
+      if (teachers.length === 0) {
+        listContainer.innerHTML = 'Hozircha ustozlar yo\'q.';
+        return;
       }
 
-      if (!teachers || teachers.length === 0) { 
-        listContainer.innerHTML = 'Ustozlar topilmadi.'; 
-        return; 
-      }
-      
       listContainer.innerHTML = '';
       teachers.forEach(t => {
         const item = document.createElement('div');
@@ -197,44 +215,41 @@
       });
     }
 
-    async function deleteTeacher(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      await supabaseClient.from('teachers').delete().eq('id', id);
+    function deleteTeacher(id) {
+      if (!confirm("Haqiqatan ham bu ustozni o'chirmoqchimisiz?")) return;
+      let teachers = getStoredTeachers();
+      teachers = teachers.filter(t => t.id !== id);
+      localStorage.setItem('school_teachers', JSON.stringify(teachers));
       loadAdminTeachers();
     }
 
     // Dars jadvalini qo'shish
-    document.getElementById('addScheduleForm').addEventListener('submit', async (e) => {
+    document.getElementById('addScheduleForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const { error } = await supabaseClient.from('schedules').insert([{
+      const schedules = getStoredSchedules();
+      const newSchedule = {
+        id: Date.now(),
         class_name: document.getElementById('sClass').value,
         day: document.getElementById('sDay').value,
         lessons: document.getElementById('sLessons').value
-      }]);
-      if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Jadval saqlandi!'); document.getElementById('addScheduleForm').reset(); loadAdminSchedules(); }
+      };
+      schedules.push(newSchedule);
+      localStorage.setItem('school_schedules', JSON.stringify(schedules));
+      alert('✅ Dars jadvali saqlandi!');
+      document.getElementById('addScheduleForm').reset();
+      loadAdminSchedules();
     });
 
-    // Dars jadvallarini chiqarish (Agar bo'sh bo'lsa namunalar qo'shib ko'rsatadi)
-    async function loadAdminSchedules() {
+    // Dars jadvallarini chiqarish
+    function loadAdminSchedules() {
       const listContainer = document.getElementById('adminScheduleList');
-      let { data: schedules } = await supabaseClient.from('schedules').select('*');
+      const schedules = getStoredSchedules();
 
-      if (!schedules || schedules.length === 0) {
-        await supabaseClient.from('schedules').insert([
-          { class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, O'qish, Jismoniy tarbiya" },
-          { class_name: "5-A sinf", day: "Dushanba", lessons: "Matematika, Ona tili, Ingliz tili, Tarix" },
-          { class_name: "6-A sinf", day: "Dushanba", lessons: "Fizika, Algebra, Ingliz tili, Ona tili" }
-        ]);
-        let { data: newS } = await supabaseClient.from('schedules').select('*');
-        schedules = newS;
+      if (schedules.length === 0) {
+        listContainer.innerHTML = 'Hozircha dars jadvallari yo\'q.';
+        return;
       }
-      
-      if (!schedules || schedules.length === 0) { 
-        listContainer.innerHTML = 'Hozircha dars jadvallari yo\'q.'; 
-        return; 
-      }
-      
+
       listContainer.innerHTML = `
         <table>
           <tr>
@@ -259,9 +274,11 @@
       });
     }
 
-    async function deleteSchedule(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      await supabaseClient.from('schedules').delete().eq('id', id);
+    function deleteSchedule(id) {
+      if (!confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
+      let schedules = getStoredSchedules();
+      schedules = schedules.filter(s => s.id !== id);
+      localStorage.setItem('school_schedules', JSON.stringify(schedules));
       loadAdminSchedules();
     }
   </script>
