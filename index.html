@@ -3,111 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maxfiy Admin Panel — Denov 84-maktab</title>
+  <title>Kengaytirilgan Admin Panel — Denov 84-maktab</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .admin-container { max-width: 700px; margin: 50px auto; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
-    .admin-container h2 { text-align: center; margin-bottom: 25px; color: var(--color-gold-300); }
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--color-gold-300); }
-    .form-group input, .form-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit; }
+    .admin-container { max-width: 900px; margin: 30px auto; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
+    .admin-nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 15px; flex-wrap: wrap; }
+    .tab-btn { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(212, 175, 55, 0.3); padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+    .tab-btn.active { background: var(--gold-gradient); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--color-gold-300); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit; }
+    
     .login-box { max-width: 400px; margin: 120px auto; padding: 35px; background: #0b1c33; border-radius: 16px; border: 2px solid var(--color-gold-400); text-align: center; box-shadow: var(--shadow-md); }
+    .delete-btn { background: #dc2626; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 700; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(212,175,55,0.2); }
   </style>
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- 1. Kirish Qismi (Parol: 84maktab) -->
+  <!-- Parol Kirish Qismi -->
   <div id="loginSection" class="login-box">
     <h3 style="color: var(--color-gold-300); margin-bottom: 20px;">🔒 Maxfiy Kirish</h3>
-    <input type="password" id="adminPassword" placeholder="Parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center; outline: none;">
+    <input type="password" id="adminPassword" placeholder="Parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center;">
     <button type="button" onclick="verifyAdmin()" class="btn btn-primary" style="width: 100%;">Kirish</button>
-    <p id="loginError" style="color: #ff4d4d; margin-top: 12px; font-size: 0.9rem; display: none;">❌ Parol noto'g'ri!</p>
+    <p id="loginError" style="color: #ff4d4d; margin-top: 12px; display: none;">❌ Parol noto'g'ri!</p>
   </div>
 
-  <!-- 2. Asosiy Boshqaruv Paneli -->
+  <!-- Asosiy Admin Panel -->
   <div id="adminPanel" class="admin-container" style="display: none;">
-    <h2>🛠️ 84-Maktab Boshqaruv Paneli</h2>
-    <p style="text-align: center; margin-bottom: 25px; color: #cbd5e1;">Bu yerdan kiritilgan ustozlar ma'lumotlari to'g'ridan-to'g'ri Supabase bazasiga saqlanadi.</p>
+    <h2>🛠️ 84-Maktab Boshqaruv Markazi</h2>
     
-    <form id="addTeacherForm">
-      <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">➕ Yangi Ustoz Qo'shish</h3>
-      
-      <div class="form-group">
-        <label>To'liq F.I.Sh:</label>
-        <input type="text" id="tName" placeholder="Masalan: Anvar Karimov" required>
-      </div>
-
-      <div class="form-group">
-        <label>Fani / Lavozimi:</label>
-        <input type="text" id="tSubject" placeholder="Masalan: Matematika o'qituvchisi" required>
-      </div>
-
-      <div class="form-group">
-        <label>Ustoz haqida ma'lumot (Bio):</label>
-        <textarea id="tBio" rows="3" placeholder="Tajribasi..." required></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Bazaga Saqlash</button>
-    </form>
-
-    <div style="margin-top: 30px; text-align: center; display: flex; justify-content: space-between; gap: 10px;">
-      <button type="button" onclick="logoutAdmin()" class="btn btn-secondary" style="border-color: #ff4d4d; color: #ff4d4d; width: 50%;">🔒 Chiqish</button>
-      <a href="index.html" class="btn btn-secondary" style="width: 50%;">⬅️ Saytni Ko'rish</a>
+    <!-- Ichki Bo'limlar Navigatsiyasi -->
+    <div class="admin-nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('teachersTab', this)">👨‍🏫 Ustozlar</button>
+      <button class="tab-btn" onclick="switchTab('scheduleTab', this)">📅 Dars Jadvali</button>
+      <button class="tab-btn" onclick="switchTab('galleryTab', this)">🖼️ Xonalar Rasmlari</button>
     </div>
-  </div>
 
-  <script>
-    // 🔑 Parol endi aniq "84maktab" qilib qo'yildi
-    const MY_SECRET_PASSWORD = "84maktab";
+    <!-- 1-BO'LIM: USTOZLAR -->
+    <div id="teachersTab" class="tab-content active">
+      <form id="addTeacherForm">
+        <h3 style="color: var(--color-gold-400); margin-bottom: 15px;">➕ Yangi Ustoz Qo'shish</h3>
+        <div class="form-group"><label>To'liq F.I.Sh:</label><input type="text" id="tName" required></div>
+        <div class="form-group"><label>Fani / Lavozimi:</label><input type="text" id="tSubject" required></div>
+        <div class="form-group"><label>Bio:</label><textarea id="tBio" rows="2" required></textarea></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Saqlash</button>
+      </form>
+      <div style="margin-top: 25px;">
+        <h4 style="color: var(--color-gold-300); margin-bottom: 10px;">📋 Bazadagi Ustozlar</h4>
+        <div id="teachersList">Yuklanmoqda...</div>
+      </div>
+    </div>
 
-    function verifyAdmin() {
-      const inputPass = document.getElementById('adminPassword').value;
-      if (inputPass === MY_SECRET_PASSWORD) {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-      } else {
-        document.getElementById('loginError').style.display = 'block';
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-      }
-    });
-
-    function logoutAdmin() {
-      sessionStorage.removeItem('isLoggedIn');
-      location.reload();
-    }
-
-    // Supabase ulanishi (O'z kalitlaringizni shu yerga yozasiz)
-    const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const full_name = document.getElementById('tName').value;
-      const subject = document.getElementById('tSubject').value;
-      const bio = document.getElementById('tBio').value;
-
-      const { error } = await supabaseClient
-        .from('teachers')
-        .insert([{ full_name, subject, bio }]);
-
-      if (error) {
-        alert('Xatolik: ' + error.message);
-      } else {
-        alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
-        document.getElementById('addTeacherForm').reset();
-      }
-    });
-  </script>
-
-</body>
-</html>
+    <!-- 2-BO'LIM: DARS JADVALI (Yangi Fan Qo'shish/O'zgartirish) -->
+    <div id="scheduleTab" class="tab-content">
+      <form id="updateScheduleForm">
+        <h3 style="color: var(--color-gold-400); margin-bottom: 15px;">✏️ Dars Jadvaliga Fan Qo'shish / Yangilash</h3>
+        <div class="form-group">
+          <label>Sinfni Tanlang:</label>
+          <select id="sClass">
+            <option value="1a">1-"A" Sinf</option>
+            <option value="5a">5-"A" Sinf</option>
+            <option value="7a">7-"A" Sinf</option>
+            <option value="11a">11-"A" Sinf</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hafta Kuni:</label>
+          <select id="sDay">
+            <option value="Dushanba">Dushanba</option>
+            <option value="Seshanba">Seshanba</option>
+            <option value="Chorshanba">Chorshan
