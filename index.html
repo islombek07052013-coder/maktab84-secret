@@ -25,7 +25,7 @@
       justify-content: center;
       padding: 20px;
     }
-    .admin-container { width: 100%; max-width: 850px; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
+    .admin-container { width: 100%; max-width: 900px; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
     .admin-container h2 { text-align: center; margin-bottom: 25px; color: var(--color-gold-300); font-family: 'Poppins', sans-serif; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--color-gold-300); }
@@ -39,6 +39,9 @@
     .delete-btn { background: #dc2626; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; }
     .delete-btn:hover { background: #b91c1c; }
     .section-divider { margin-top: 40px; border-top: 2px dashed rgba(212, 175, 55, 0.3); padding-top: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(212, 175, 55, 0.2); font-size: 0.9rem; }
+    th { color: var(--color-gold-300); background: rgba(0,0,0,0.5); }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -85,7 +88,7 @@
         <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini Qo'shish / O'zgartirish</h3>
         <div class="form-group">
           <label>Sinf:</label>
-          <input type="text" id="sClass" placeholder="Masalan: 5-A sinf" required>
+          <input type="text" id="sClass" placeholder="Masalan: 1-A sinf" required>
         </div>
         <div class="form-group">
           <label>Hafta kuni:</label>
@@ -100,13 +103,13 @@
         </div>
         <div class="form-group">
           <label>Darslar ro'yxati (vergul bilan ajratib yozing):</label>
-          <input type="text" id="sLessons" placeholder="Matematika, Ona tili, Ingliz tili, Fizika" required>
+          <input type="text" id="sLessons" placeholder="Ona tili, Matematika, O'qish, Jismoniy tarbiya" required>
         </div>
         <button type="submit" class="btn btn-primary">📅 Jadvalni Saqlash</button>
       </form>
 
       <div style="margin-top: 25px;">
-        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Bazadagi Dars Jadvallari (O'chirish uchun)</h4>
+        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Barcha Sinflarning Dars Jadvallari (Ko'rinib turishi va O'chirish uchun)</h4>
         <div id="adminScheduleList">Yuklanmoqda...</div>
       </div>
     </div>
@@ -143,7 +146,7 @@
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
     const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // <-- SHU YERGA O'ZINGIZNING SUPABASE ANON KALITINGIZNI YOZING!
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function loadAdminData() {
@@ -163,22 +166,18 @@
       else { alert('✅ Muvaffaqiyatli saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
     });
 
-    // Ustozlarni chiqarish (Agar baza bo'sh bo'lsa, avtomatik namuna qo'shib ko'rsatadi)
+    // Ustozlarni chiqarish
     async function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
-      let { data: teachers } = await supabaseClient.from('teachers').select('*');
+      let { data: teachers, error } = await supabaseClient.from('teachers').select('*');
       
-      if (!teachers || teachers.length === 0) {
-        // Baza bo'sh bo'lsa, avtomatik bitta namuna qo'shamizki, o'chirishni sinab ko'rasiz
-        await supabaseClient.from('teachers').insert([
-          { full_name: "Maktab Direktori (Namuna)", subject: "Direktor", bio: "O'zgartirish yoki o'chirish mumkin." }
-        ]);
-        let { data: newTeachers } = await supabaseClient.from('teachers').select('*');
-        teachers = newTeachers;
+      if (error) {
+        listContainer.innerHTML = '<span style="color:#ff4d4d;">Bohlanish xatoligi yoki kalit noto\'g\'ri!</span>';
+        return;
       }
 
       if (!teachers || teachers.length === 0) { 
-        listContainer.innerHTML = 'Hozircha bazada ma\'lumot yo\'q.'; 
+        listContainer.innerHTML = 'Hozircha bazada ustozlar yo\'q. Yuqoridan qo\'shishingiz mumkin.'; 
         return; 
       }
       
@@ -210,17 +209,37 @@
       else { alert('✅ Dars jadvali saqlandi!'); document.getElementById('addScheduleForm').reset(); loadAdminSchedules(); }
     });
 
-    // Dars jadvallarini chiqarish
+    // Barcha dars jadvallarini ko'rinib turadigan qilib chiqarish
     async function loadAdminSchedules() {
       const listContainer = document.getElementById('adminScheduleList');
-      let { data: schedules } = await supabaseClient.from('schedules').select('*');
-      if (!schedules || schedules.length === 0) { listContainer.innerHTML = 'Hozircha dars jadvallari yo\'q.'; return; }
-      listContainer.innerHTML = '';
+      let { data: schedules, error } = await supabaseClient.from('schedules').select('*');
+      
+      if (error || !schedules || schedules.length === 0) { 
+        listContainer.innerHTML = 'Hozircha dars jadvallari kiritilmagan.'; 
+        return; 
+      }
+      
+      listContainer.innerHTML = `
+        <table>
+          <tr>
+            <th>Sinf</th>
+            <th>Hafta kuni</th>
+            <th>Darslar</th>
+            <th>Amal</th>
+          </tr>
+        </table>
+      `;
+      const table = listContainer.querySelector('table');
+
       schedules.forEach(s => {
-        const item = document.createElement('div');
-        item.className = 'manage-item';
-        item.innerHTML = `<div><strong>${s.class_name} (${s.day})</strong><br><small style="color:#cbd5e1;">${s.lessons}</small></div><button class="delete-btn" onclick="deleteSchedule(${s.id})">O'chirish</button>`;
-        listContainer.appendChild(item);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${s.class_name}</strong></td>
+          <td><span style="color:var(--color-gold-300);">${s.day}</span></td>
+          <td>${s.lessons}</td>
+          <td><button class="delete-btn" style="padding:4px 10px; font-size:0.8rem;" onclick="deleteSchedule(${s.id})">O'chirish</button></td>
+        `;
+        table.appendChild(row);
       });
     }
 
