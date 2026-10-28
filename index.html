@@ -257,7 +257,6 @@
       const sDay = document.getElementById('sDay').value;
       const sLessons = document.getElementById('sLessons').value;
 
-      // Agar oldindan bo'lsa yangilaymiz
       const idx = schedules.findIndex(s => s.class_name === cName && s.day === sDay);
       if (idx > -1) {
         schedules[idx].lessons = sLessons;
