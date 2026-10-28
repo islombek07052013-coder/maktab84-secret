@@ -12,14 +12,9 @@
     .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--color-gold-300); }
     .form-group input, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit; }
     .login-box { max-width: 400px; margin: 120px auto; padding: 35px; background: #0b1c33; border-radius: 16px; border: 2px solid var(--color-gold-400); text-align: center; box-shadow: var(--shadow-md); }
-    
-    /* Ustozlar ro'yxati jadvali */
-    .teacher-manage-list { margin-top: 30px; border-top: 1px solid rgba(212, 175, 55, 0.3); padding-top: 20px; }
     .manage-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(212, 175, 55, 0.2); }
-    .delete-btn { background: #dc2626; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-    .delete-btn:hover { background: #b91c1c; }
+    .delete-btn { background: #dc2626; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 700; }
   </style>
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -36,31 +31,16 @@
   <div id="adminPanel" class="admin-container" style="display: none;">
     <h2>🛠️ 84-Maktab Boshqaruv Paneli</h2>
     
-    <!-- Yangi Ustoz Qo'shish Formasi -->
     <form id="addTeacherForm">
       <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">➕ Yangi Ustoz Qo'shish</h3>
-      
-      <div class="form-group">
-        <label>To'liq F.I.Sh:</label>
-        <input type="text" id="tName" placeholder="Masalan: Anvar Karimov" required>
-      </div>
-
-      <div class="form-group">
-        <label>Fani / Lavozimi:</label>
-        <input type="text" id="tSubject" placeholder="Masalan: Matematika o'qituvchisi" required>
-      </div>
-
-      <div class="form-group">
-        <label>Ustoz haqida ma'lumot (Bio):</label>
-        <textarea id="tBio" rows="2" placeholder="Tajribasi..." required></textarea>
-      </div>
-
+      <div class="form-group"><label>To'liq F.I.Sh:</label><input type="text" id="tName" required></div>
+      <div class="form-group"><label>Fani / Lavozimi:</label><input type="text" id="tSubject" required></div>
+      <div class="form-group"><label>Ma'lumot (Bio):</label><textarea id="tBio" rows="2" required></textarea></div>
       <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Bazaga Saqlash</button>
     </form>
 
-    <!-- Bazadagi Ustozlarni Boshqarish / O'chirish Bo'limi -->
-    <div class="teacher-manage-list">
-      <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">📋 Bazadagi Ustozlar Ro'yxati (O'chirish uchun)</h3>
+    <div style="margin-top: 30px;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">📋 Bazadagi Ustozlar (O'chirish)</h3>
       <div id="adminTeachersList">Yuklanmoqda...</div>
     </div>
 
@@ -74,8 +54,7 @@
     const MY_SECRET_PASSWORD = "84maktab";
 
     function verifyAdmin() {
-      const inputPass = document.getElementById('adminPassword').value;
-      if (inputPass === MY_SECRET_PASSWORD) {
+      if (document.getElementById('adminPassword').value === MY_SECRET_PASSWORD) {
         sessionStorage.setItem('isLoggedIn', 'true');
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
@@ -93,80 +72,41 @@
       }
     });
 
-    function logoutAdmin() {
-      sessionStorage.removeItem('isLoggedIn');
-      location.reload();
-    }
+    function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
-    // Supabase ulanishi
     const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'z anon keyingizni yozasiz
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Yangi ustoz qo'shish
     document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const full_name = document.getElementById('tName').value;
-      const subject = document.getElementById('tSubject').value;
-      const bio = document.getElementById('tBio').value;
-
-      const { error } = await supabaseClient
-        .from('teachers')
-        .insert([{ full_name, subject, bio }]);
-
-      if (error) {
-        alert('Xatolik: ' + error.message);
-      } else {
-        alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
-        document.getElementById('addTeacherForm').reset();
-        loadAdminTeachers();
-      }
+      const { error } = await supabaseClient.from('teachers').insert([{
+        full_name: document.getElementById('tName').value,
+        subject: document.getElementById('tSubject').value,
+        bio: document.getElementById('tBio').value
+      }]);
+      if (error) alert('Xatolik: ' + error.message);
+      else { alert('✅ Qo\'shildi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
     });
 
-    // Bazadagi ustozlarni admin panelga chiqarish va o'chirish imkoniyati
     async function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
-      if (!listContainer) return;
-
-      let { data: teachers, error } = await supabaseClient.from('teachers').select('*');
-      if (error) {
-        listContainer.innerHTML = 'Xatolik yuz berdi.';
-        return;
-      }
-
-      if (!teachers || teachers.length === 0) {
-        listContainer.innerHTML = '<p style="color: #94a3b8; font-size: 0.9rem;">Hozircha bazada ustozlar yo\'q.</p>';
-        return;
-      }
-
+      let { data: teachers } = await supabaseClient.from('teachers').select('*');
+      if (!teachers || teachers.length === 0) { listContainer.innerHTML = 'Hozircha ustozlar yo\'q.'; return; }
       listContainer.innerHTML = '';
       teachers.forEach(t => {
         const item = document.createElement('div');
         item.className = 'manage-item';
-        item.innerHTML = `
-          <div>
-            <strong>${t.full_name}</strong>
-            <p style="font-size: 0.82rem; color: #94a3b8; margin: 0;">${t.subject}</p>
-          </div>
-          <button class="delete-btn" onclick="deleteTeacher(${t.id})">O'chirish</button>
-        `;
+        item.innerHTML = `<div><strong>${t.full_name}</strong><br><small>${t.subject}</small></div><button class="delete-btn" onclick="deleteTeacher(${t.id})">O'chirish</button>`;
         listContainer.appendChild(item);
       });
     }
 
-    // Ustozni bazadan o'chirish funksiyasi
     async function deleteTeacher(id) {
-      if (!confirm("Haqiqatan ham bu ustozni o'chirmoqchimisiz?")) return;
-
-      const { error } `<source id="3">` = await supabaseClient.from('teachers').delete().eq('id', id);
-      if (error) {
-        alert('O\'chirishda xatolik: ' + error.message);
-      } else {
-        alert('🗑️ Ustoz muvaffaqiyatli o\'chirildi!');
-        loadAdminTeachers();
-      }
+      if (!confirm("O'chirmoqchimisiz?")) return;
+      await supabaseClient.from('teachers').delete().eq('id', id);
+      loadAdminTeachers();
     }
   </script>
-
 </body>
 </html>
