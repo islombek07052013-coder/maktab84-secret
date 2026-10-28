@@ -25,7 +25,7 @@
       justify-content: center;
       padding: 20px;
     }
-    .admin-container { width: 100%; max-width: 950px; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
+    .admin-container { width: 100%; max-width: 950px; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; margin: 20px 0; }
     .admin-container h2 { text-align: center; margin-bottom: 25px; color: var(--color-gold-300); font-family: 'Poppins', sans-serif; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--color-gold-300); }
@@ -58,33 +58,33 @@
   <div id="adminPanel" class="admin-container" style="display: none;">
     <h2>🛠️ Denov 84-Maktab Boshqaruv Paneli</h2>
     
-    <!-- 1. USTOZLAR VA DIREKTORNI BOSHQARISH -->
+    <!-- 1. USTOZLARNI BOSHQARISH -->
     <form id="addTeacherForm">
-      <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">👨‍🏫 Yangi Ustoz yoki Rahbar Qo'shish</h3>
+      <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">👨‍🏫 Yangi Ustoz Qo'shish / O'chirish</h3>
       <div class="form-group">
         <label>To'liq F.I.Sh:</label>
         <input type="text" id="tName" placeholder="Masalan: Ismayilov Sherzod Chorievich" required>
       </div>
       <div class="form-group">
         <label>Fani / Lavozimi:</label>
-        <input type="text" id="tSubject" placeholder="Masalan: Maktab Direktori" required>
+        <input type="text" id="tSubject" placeholder="Masalan: Matematika o'qituvchisi" required>
       </div>
       <div class="form-group">
-        <label>Ma'lumot (Toifasi):</label>
-        <input type="text" id="tBio" placeholder="Masalan: Oliy toifali pedagog" required>
+        <label>Toifasi (Ma'lumot):</label>
+        <input type="text" id="tBio" placeholder="Masalan: Oliy toifa" required>
       </div>
-      <button type="submit" class="btn btn-primary">💾 Saqlash</button>
+      <button type="submit" class="btn btn-primary">💾 Ustozni Qo'shish</button>
     </form>
 
     <div style="margin-top: 25px;">
-      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Barcha Ustozlar Ro'yxati</h4>
+      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Ustozlar Ro'yxati (O'chirish imkoniyati bilan)</h4>
       <div id="adminTeachersList">Yuklanmoqda...</div>
     </div>
 
-    <!-- 2. DARS JADVALINI BOSHQARISH (1-11 A, B, V) -->
+    <!-- 2. DARS JADVALINI BOSHQARISH -->
     <div class="section-divider">
       <form id="addScheduleForm">
-        <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini Qo'shish / O'zgartirish</h3>
+        <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini O'zgartirish</h3>
         <div class="form-group">
           <label>Sinfni Tanlang (1-11 A, B, V):</label>
           <select id="sClass" required>
@@ -114,14 +114,41 @@
         </div>
         <div class="form-group">
           <label>Darslar ro'yxati (vergul bilan ajratib yozing):</label>
-          <input type="text" id="sLessons" placeholder="Ona tili, Matematika, O'qish, Jismoniy tarbiya" required>
+          <input type="text" id="sLessons" placeholder="Matematika, Ona tili, Jismoniy tarbiya..." required>
         </div>
         <button type="submit" class="btn btn-primary">📅 Jadvalni Saqlash</button>
       </form>
 
       <div style="margin-top: 25px;">
-        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Sinflarning Dars Jadvallari</h4>
+        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Sinflar Jadvallari</h4>
         <div id="adminScheduleList">Yuklanmoqda...</div>
+      </div>
+    </div>
+
+    <!-- 3. XONA RASMLARINI O'ZGARTIRISH -->
+    <div class="section-divider">
+      <form id="addRoomPhotoForm">
+        <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">🖼️ Xona Rasmlarini O'zgartirish / Qo'shish</h3>
+        <div class="form-group">
+          <label>Xonani tanlang:</label>
+          <select id="roomName" required>
+            <option value="IT va Kompyuter Xonasi">IT va Kompyuter Xonasi</option>
+            <option value="Tikuvchilik va Dizayn Xonasi">Tikuvchilik va Dizayn Xonasi</option>
+            <option value="Musiqa Xonasi">Musiqa Xonasi</option>
+            <option value="Tasviriy San'at Xonasi">Tasviriy San'at Xonasi</option>
+            <option value="Texnologiya Xonasi">Texnologiya Xonasi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Rasm havolasi (URL yoki fayl manzili):</label>
+          <input type="text" id="roomImgUrl" placeholder="Masalan: images/it_1.jpg yoki rasm havolasini yoping" required>
+        </div>
+        <button type="submit" class="btn btn-primary">🖼️ Rasmni Yangilash</button>
+      </form>
+
+      <div style="margin-top: 25px;">
+        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Kiritilgan Xona Rasmlari</h4>
+        <div id="adminRoomsList">Yuklanmoqda...</div>
       </div>
     </div>
 
@@ -156,45 +183,14 @@
 
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
-    // 37 ta haqiqiy ustozlar ro'yxati
+    // 1. USTOZLAR
     const defaultTeachersList = [
-      { id: 1, full_name: "Ismayilov Sherzod Chorievich", subject: "Maktab Direktori", bio: "Oliy toifali pedagog" },
+      { id: 1, full_name: "Ismayilov Sherzod Chorievich", subject: "Maktab Direktori", bio: "Oliy toifa" },
       { id: 2, full_name: "Soatov Faxriddin Abdurayimovich", subject: "O'IBDO'", bio: "Oliy toifa" },
       { id: 3, full_name: "Mitanov Sherzod Erkinovich", subject: "MMIBDO'", bio: "Oliy toifa" },
       { id: 4, full_name: "Alimardonova Muyassar Yaxshibaevna", subject: "O'IBDO' / Matematika", bio: "Oliy toifa" },
       { id: 5, full_name: "Yo'ldosheva Madina Hasanovna", subject: "Psixolog", bio: "Mutaxassis" },
-      { id: 6, full_name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar bo'yicha menejer", bio: "Mutaxassis" },
-      { id: 7, full_name: "Rustamov Akram Xolmuminovich", subject: "ChQBT rahbari", bio: "Mutaxassis" },
-      { id: 8, full_name: "Ismailova Dildora Chorievna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "1-toifa" },
-      { id: 9, full_name: "Erdonova Feruza Xolbrevna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
-      { id: 10, full_name: "Avazova Xurshida Normurotovna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
-      { id: 11, full_name: "Eshonqulova Afifabonu Tulqin qizi", subject: "Rus tili va adabiyoti o'qituvchisi", bio: "1-toifa" },
-      { id: 12, full_name: "Mamajonova Nilufar Abdubannon qizi", subject: "Rus tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
-      { id: 13, full_name: "Mardanova Zarnigor Alisher qizi", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
-      { id: 14, full_name: "Karimov Abdulxofiz Abduvaxob o'g'li", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
-      { id: 15, full_name: "Isroilova Jamila", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
-      { id: 16, full_name: "Sultonmurodov Erkin Abdug'aniyevich", subject: "Matematika o'qituvchisi", bio: "Oliy toifa" },
-      { id: 17, full_name: "Chorieva Dildora Mamatmurotovna", subject: "Matematika o'qituvchisi", bio: "1-toifa" },
-      { id: 18, full_name: "Safarova Saboxat Muxammadievna", subject: "Matematika o'qituvchisi", bio: "2-toifa" },
-      { id: 19, full_name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o'qituvchisi", bio: "1-toifa" },
-      { id: 20, full_name: "Nosirjona Laylo Abdusalom qizi", subject: "Informatika o'qituvchisi", bio: "Mutaxassis" },
-      { id: 21, full_name: "Ochilova Zulayxo Jahongir qizi", subject: "Fizika va Astronomiya o'qituvchisi", bio: "Mutaxassis" },
-      { id: 22, full_name: "Omonov Umid O'ral o'g'li", subject: "Tabiiy fan va Fizika o'qituvchisi", bio: "Mutaxassis" },
-      { id: 23, full_name: "Nasrullaev Ravshan Yangibaevich", subject: "Tarbiya o'qituvchisi", bio: "1-toifa" },
-      { id: 24, full_name: "Xasanov Xushnud Turg'unovich", subject: "Tarix o'qituvchisi", bio: "1-toifa" },
-      { id: 25, full_name: "Bakirov Sherali Ubaydullaevich", subject: "Biologiya o'qituvchisi", bio: "2-toifa" },
-      { id: 26, full_name: "Shinaev Abdiraim Eshpo'latovich", subject: "Kimyo o'qituvchisi", bio: "2-toifa" },
-      { id: 27, full_name: "Jo'raeva Shaxlo Abdurayimovna", subject: "Geografiya o'qituvchisi", bio: "Oliy toifa" },
-      { id: 28, full_name: "Ergasheva Pokiza Anvar qizi", subject: "Geografiya o'qituvchisi", bio: "2-toifa" },
-      { id: 29, full_name: "Xaydarov Muhammad Zahriddinovich", subject: "Musiqa o'qituvchisi", bio: "Oliy toifa" },
-      { id: 30, full_name: "Fayzullaeva Iqbol Boyburievna", subject: "Tasviriy san'at o'qituvchisi", bio: "Oliy toifa" },
-      { id: 31, full_name: "Terkashov Sirojiddin Abdusamatovich", subject: "Tasviriy san'at va chizmachilik o'qituvchisi", bio: "1-toifa" },
-      { id: 32, full_name: "Normuminov Ulugbek Tojimurotovich", subject: "Jismoniy tarbiya o'qituvchisi", bio: "1-toifa" },
-      { id: 33, full_name: "Akramov Xumoiddin Akmal o'g'li", subject: "Jismoniy tarbiya o'qituvchisi", bio: "1-toifa" },
-      { id: 34, full_name: "Davlatova Etibor Abdunazarovna", subject: "Boshlang'ich sinf o'qituvchisi", bio: "Oliy toifa" },
-      { id: 35, full_name: "Normurodova Dilrabo Erkin qizi", subject: "Boshlang'ich sinf o'qituvchisi", bio: "1-toifa" },
-      { id: 36, full_name: "Irismatova Dilbar Chorievna", subject: "Boshlang'ich sinf o'qituvchisi", bio: "1-toifa" },
-      { id: 37, full_name: "Jumaeva Sharifa Umarali qizi", subject: "Boshlang'ich sinf o'qituvchisi", bio: "2-toifa" }
+      { id: 6, full_name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar menejeri", bio: "Mutaxassis" }
     ];
 
     function getStoredTeachers() {
@@ -206,132 +202,149 @@
       return JSON.parse(data);
     }
 
+    document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let teachers = getStoredTeachers();
+      teachers.push({
+        id: Date.now(),
+        full_name: document.getElementById('tName').value,
+        subject: document.getElementById('tSubject').value,
+        bio: document.getElementById('tBio').value
+      });
+      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
+      alert('✅ Yangi ustoz qo\'shildi!');
+      document.getElementById('addTeacherForm').reset();
+      loadAdminTeachers();
+    });
+
+    function loadAdminTeachers() {
+      const list = document.getElementById('adminTeachersList');
+      const teachers = getStoredTeachers();
+      if (teachers.length === 0) { list.innerHTML = 'Ustozlar yoq.'; return; }
+      list.innerHTML = '';
+      teachers.forEach(t => {
+        list.innerHTML += `
+          <div class="manage-item">
+            <div><strong>${t.full_name}</strong> - <small style="color:#d4af37;">${t.subject}</small></div>
+            <button class="delete-btn" onclick="deleteTeacher(${t.id})">O'chirish</button>
+          </div>
+        `;
+      });
+    }
+
+    function deleteTeacher(id) {
+      if (!confirm("O'chirmoqchimisiz?")) return;
+      let teachers = getStoredTeachers().filter(t => t.id !== id);
+      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
+      loadAdminTeachers();
+    }
+
+    // 2. DARS JADVALI
     function getStoredSchedules() {
       const data = localStorage.getItem('school_schedules_v3');
       if (!data) {
-        const defaults = [
-          { id: 1, class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, O'qish, Jismoniy tarbiya, Odobnoma" },
-          { id: 2, class_name: "5-A sinf", day: "Dushanba", lessons: "Matematika, Ona tili, Ingliz tili, Tarix" },
-          { id: 3, class_name: "11-A sinf", day: "Dushanba", lessons: "Algebra, Fizika, Kimyo, Tarix, Ingliz tili" }
-        ];
+        const defaults = [{ id: 1, class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, Jismoniy tarbiya" }];
         localStorage.setItem('school_schedules_v3', JSON.stringify(defaults));
         return defaults;
       }
       return JSON.parse(data);
     }
 
-    function loadAdminData() {
-      loadAdminTeachers();
-      loadAdminSchedules();
-    }
-
-    // Ustoz qo'shish
-    document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const teachers = getStoredTeachers();
-      const newTeacher = {
-        id: Date.now(),
-        full_name: document.getElementById('tName').value,
-        subject: document.getElementById('tSubject').value,
-        bio: document.getElementById('tBio').value
-      };
-      teachers.push(newTeacher);
-      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
-      alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
-      document.getElementById('addTeacherForm').reset();
-      loadAdminTeachers();
-    });
-
-    // Ustozlarni chiqarish
-    function loadAdminTeachers() {
-      const listContainer = document.getElementById('adminTeachersList');
-      const teachers = getStoredTeachers();
-      
-      if (teachers.length === 0) {
-        listContainer.innerHTML = 'Hozircha ustozlar yo\'q.';
-        return;
-      }
-
-      listContainer.innerHTML = '';
-      teachers.forEach(t => {
-        const item = document.createElement('div');
-        item.className = 'manage-item';
-        item.innerHTML = `
-          <div>
-            <strong>${t.full_name}</strong> <small style="color:#cbd5e1;">(${t.bio || ''})</small><br>
-            <small style="color:#d4af37;">${t.subject}</small>
-          </div>
-          <button class="delete-btn" onclick="deleteTeacher(${t.id})">O'chirish</button>
-        `;
-        listContainer.appendChild(item);
-      });
-    }
-
-    function deleteTeacher(id) {
-      if (!confirm("Haqiqatan ham bu ustozni o'chirmoqchimisiz?")) return;
-      let teachers = getStoredTeachers();
-      teachers = teachers.filter(t => t.id !== id);
-      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
-      loadAdminTeachers();
-    }
-
-    // Dars jadvalini qo'shish
     document.getElementById('addScheduleForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const schedules = getStoredSchedules();
-      const newSchedule = {
-        id: Date.now(),
-        class_name: document.getElementById('sClass').value,
-        day: document.getElementById('sDay').value,
-        lessons: document.getElementById('sLessons').value
-      };
-      schedules.push(newSchedule);
+      let schedules = getStoredSchedules();
+      const cName = document.getElementById('sClass').value;
+      const sDay = document.getElementById('sDay').value;
+      const sLessons = document.getElementById('sLessons').value;
+
+      // Agar oldindan bo'lsa yangilaymiz
+      const idx = schedules.findIndex(s => s.class_name === cName && s.day === sDay);
+      if (idx > -1) {
+        schedules[idx].lessons = sLessons;
+      } else {
+        schedules.push({ id: Date.now(), class_name: cName, day: sDay, lessons: sLessons });
+      }
       localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
       alert('✅ Dars jadvali saqlandi!');
-      document.getElementById('addScheduleForm').reset();
       loadAdminSchedules();
     });
 
-    // Dars jadvallarini chiqarish
     function loadAdminSchedules() {
-      const listContainer = document.getElementById('adminScheduleList');
+      const list = document.getElementById('adminScheduleList');
       const schedules = getStoredSchedules();
-
-      if (schedules.length === 0) {
-        listContainer.innerHTML = 'Hozircha dars jadvallari kiritilmagan.';
-        return;
-      }
-
-      listContainer.innerHTML = `
-        <table>
-          <tr>
-            <th>Sinf</th>
-            <th>Hafta kuni</th>
-            <th>Darslar</th>
-            <th>Amal</th>
-          </tr>
-        </table>
-      `;
-      const table = listContainer.querySelector('table');
-
+      if (schedules.length === 0) { list.innerHTML = 'Jadval yoq.'; return; }
+      let html = `<table><tr><th>Sinf</th><th>Kun</th><th>Darslar</th><th>Amal</th></tr>`;
       schedules.forEach(s => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><strong>${s.class_name}</strong></td>
-          <td><span style="color:var(--color-gold-300);">${s.day}</span></td>
-          <td>${s.lessons}</td>
-          <td><button class="delete-btn" style="padding:4px 10px; font-size:0.8rem;" onclick="deleteSchedule(${s.id})">O'chirish</button></td>
-        `;
-        table.appendChild(row);
+        html += `<tr><td>${s.class_name}</td><td>${s.day}</td><td>${s.lessons}</td><td><button class="delete-btn" style="padding:4px 8px;" onclick="deleteSchedule(${s.id})">O'chirish</button></td></tr>`;
       });
+      html += `</table>`;
+      list.innerHTML = html;
     }
 
     function deleteSchedule(id) {
       if (!confirm("O'chirmoqchimisiz?")) return;
-      let schedules = getStoredSchedules();
-      schedules = schedules.filter(s => s.id !== id);
+      let schedules = getStoredSchedules().filter(s => s.id !== id);
       localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
       loadAdminSchedules();
+    }
+
+    // 3. XONA RASMLARI
+    function getStoredRooms() {
+      const data = localStorage.getItem('school_rooms_v1');
+      if (!data) {
+        const defaults = [
+          { id: 1, room: "IT va Kompyuter Xonasi", url: "images/it_1.jpg.jpg" },
+          { id: 2, room: "Tikuvchilik va Dizayn Xonasi", url: "images/sewing_1.jpg.jpg" }
+        ];
+        localStorage.setItem('school_rooms_v1', JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(data);
+    }
+
+    document.getElementById('addRoomPhotoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let rooms = getStoredRooms();
+      const rName = document.getElementById('roomName').value;
+      const rUrl = document.getElementById('roomImgUrl').value;
+
+      const idx = rooms.findIndex(r => r.room === rName);
+      if (idx > -1) {
+        rooms[idx].url = rUrl;
+      } else {
+        rooms.push({ id: Date.now(), room: rName, url: rUrl });
+      }
+      localStorage.setItem('school_rooms_v1', JSON.stringify(rooms));
+      alert('✅ Xona rasmi yangilandi!');
+      loadAdminRooms();
+    });
+
+    function loadAdminRooms() {
+      const list = document.getElementById('adminRoomsList');
+      const rooms = getStoredRooms();
+      if (rooms.length === 0) { list.innerHTML = 'Rasmlar yoq.'; return; }
+      list.innerHTML = '';
+      rooms.forEach(r => {
+        list.innerHTML += `
+          <div class="manage-item">
+            <div><strong>${r.room}</strong><br><small style="color:#cbd5e1;">${r.url}</small></div>
+            <button class="delete-btn" onclick="deleteRoom(${r.id})">O'chirish</button>
+          </div>
+        `;
+      });
+    }
+
+    function deleteRoom(id) {
+      if (!confirm("O'chirmoqchimisiz?")) return;
+      let rooms = getStoredRooms().filter(r => r.id !== id);
+      localStorage.setItem('school_rooms_v1', JSON.stringify(rooms));
+      loadAdminRooms();
+    }
+
+    function loadAdminData() {
+      loadAdminTeachers();
+      loadAdminSchedules();
+      loadAdminRooms();
     }
   </script>
 </body>
