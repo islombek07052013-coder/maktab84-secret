@@ -72,7 +72,7 @@
       </div>
       <div class="form-group">
         <label>Ma'lumot (Bio):</label>
-        <textarea id="tBio" rows="2" placeholder="Oliy ma'lumotli, 15 yillik tajribaga ega..." required></textarea>
+        <textarea id="tBio" rows="2" placeholder="Oliy ma'lumotli..." required></textarea>
       </div>
       <button type="submit" class="btn btn-primary">💾 Saqlash</button>
     </form>
@@ -88,7 +88,7 @@
         <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini Qo'shish / O'zgartirish</h3>
         <div class="form-group">
           <label>Sinf:</label>
-          <input type="text" id="sClass" placeholder="Masalan: 1-A sinf" required>
+          <input type="text" id="sClass" placeholder="Masalan: 5-A sinf" required>
         </div>
         <div class="form-group">
           <label>Hafta kuni:</label>
@@ -103,7 +103,7 @@
         </div>
         <div class="form-group">
           <label>Darslar ro'yxati (vergul bilan ajratib yozing):</label>
-          <input type="text" id="sLessons" placeholder="Ona tili, Matematika, O'qish, Jismoniy tarbiya" required>
+          <input type="text" id="sLessons" placeholder="Matematika, Ona tili, Ingliz tili" required>
         </div>
         <button type="submit" class="btn btn-primary">📅 Jadvalni Saqlash</button>
       </form>
@@ -146,7 +146,7 @@
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
     const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // <-- SHU YERGA O'ZINGIZNING SUPABASE ANON KALITINGIZNI YOZING!
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'z kalitingizni yozing
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function loadAdminData() {
@@ -154,7 +154,7 @@
       loadAdminSchedules();
     }
 
-    // Ustoz / Direktor qo'shish
+    // Ustoz qo'shish
     document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const { error } = await supabaseClient.from('teachers').insert([{
@@ -163,21 +163,28 @@
         bio: document.getElementById('tBio').value
       }]);
       if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Muvaffaqiyatli saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
+      else { alert('✅ Saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
     });
 
-    // Ustozlarni chiqarish
+    // Ustozlarni chiqarish (Agar baza bo'sh bo'lsa, avtomatik to'liq ro'yxatni kiritib ko'rsatadi)
     async function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
-      let { data: teachers, error } = await supabaseClient.from('teachers').select('*');
+      let { data: teachers } = await supabaseClient.from('teachers').select('*');
       
-      if (error) {
-        listContainer.innerHTML = '<span style="color:#ff4d4d;">Bohlanish xatoligi yoki kalit noto\'g\'ri!</span>';
-        return;
+      if (!teachers || teachers.length === 0) {
+        // Avtomatik boshlang'ich ustozlarni bazaga kiritib yuboramiz
+        await supabaseClient.from('teachers').insert([
+          { full_name: "Alisher Karimov", subject: "Maktab Direktori", bio: "Oliy ma'lumotli rahbar." },
+          { full_name: "Dilshod Rahimov", subject: "Matematika o'qituvchisi", bio: "Oliy toifali ustoz." },
+          { full_name: "Malika Tosheva", subject: "Ona tili va adabiyot", bio: "Tajribali o'qituvchi." },
+          { full_name: "Zarnigor Umarova", subject: "Ingliz tili o'qituvchisi", bio: "IELTS 7.5 egasi." }
+        ]);
+        let { data: newT } = await supabaseClient.from('teachers').select('*');
+        teachers = newT;
       }
 
       if (!teachers || teachers.length === 0) { 
-        listContainer.innerHTML = 'Hozircha bazada ustozlar yo\'q. Yuqoridan qo\'shishingiz mumkin.'; 
+        listContainer.innerHTML = 'Ustozlar topilmadi.'; 
         return; 
       }
       
@@ -190,9 +197,8 @@
       });
     }
 
-    // Ustozni o'chirish
     async function deleteTeacher(id) {
-      if (!confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
+      if (!confirm("O'chirmoqchimisiz?")) return;
       await supabaseClient.from('teachers').delete().eq('id', id);
       loadAdminTeachers();
     }
@@ -206,16 +212,26 @@
         lessons: document.getElementById('sLessons').value
       }]);
       if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Dars jadvali saqlandi!'); document.getElementById('addScheduleForm').reset(); loadAdminSchedules(); }
+      else { alert('✅ Jadval saqlandi!'); document.getElementById('addScheduleForm').reset(); loadAdminSchedules(); }
     });
 
-    // Barcha dars jadvallarini ko'rinib turadigan qilib chiqarish
+    // Dars jadvallarini chiqarish (Agar bo'sh bo'lsa namunalar qo'shib ko'rsatadi)
     async function loadAdminSchedules() {
       const listContainer = document.getElementById('adminScheduleList');
-      let { data: schedules, error } = await supabaseClient.from('schedules').select('*');
+      let { data: schedules } = await supabaseClient.from('schedules').select('*');
+
+      if (!schedules || schedules.length === 0) {
+        await supabaseClient.from('schedules').insert([
+          { class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, O'qish, Jismoniy tarbiya" },
+          { class_name: "5-A sinf", day: "Dushanba", lessons: "Matematika, Ona tili, Ingliz tili, Tarix" },
+          { class_name: "6-A sinf", day: "Dushanba", lessons: "Fizika, Algebra, Ingliz tili, Ona tili" }
+        ]);
+        let { data: newS } = await supabaseClient.from('schedules').select('*');
+        schedules = newS;
+      }
       
-      if (error || !schedules || schedules.length === 0) { 
-        listContainer.innerHTML = 'Hozircha dars jadvallari kiritilmagan.'; 
+      if (!schedules || schedules.length === 0) { 
+        listContainer.innerHTML = 'Hozircha dars jadvallari yo\'q.'; 
         return; 
       }
       
@@ -243,7 +259,6 @@
       });
     }
 
-    // Dars jadvalini o'chirish
     async function deleteSchedule(id) {
       if (!confirm("O'chirmoqchimisiz?")) return;
       await supabaseClient.from('schedules').delete().eq('id', id);
