@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maxfiy Admin Panel — Denov 84-maktab</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container { max-width: 700px; margin: 50px auto; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; }
+    .admin-container h2 { text-align: center; margin-bottom: 25px; color: var(--color-gold-300); }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--color-gold-300); }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit; }
+    .login-box { max-width: 400px; margin: 120px auto; padding: 35px; background: #0b1c33; border-radius: 16px; border: 2px solid var(--color-gold-400); text-align: center; box-shadow: var(--shadow-md); }
+  </style>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Parol Kirish Qismi -->
+  <div id="loginSection" class="login-box">
+    <h3 style="color: var(--color-gold-300); margin-bottom: 20px;">🔒 Maxfiy Kirish</h3>
+    <input type="password" id="adminPassword" placeholder="Maxfiy parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center; outline: none;">
+    <button type="button" onclick="verifyAdmin()" class="btn btn-primary" style="width: 100%;">Kirish</button>
+    <p id="loginError" style="color: #ff4d4d; margin-top: 12px; font-size: 0.9rem; display: none;">❌ Parol noto'g'ri!</p>
+  </div>
+
+  <!-- Boshqaruv Paneli -->
+  <div id="adminPanel" class="admin-container" style="display: none;">
+    <h2>🛠️ 84-Maktab Boshqaruv Paneli</h2>
+    <p style="text-align: center; margin-bottom: 25px; color: #cbd5e1;">Bu yerdan kiritilgan ustozlar ma'lumotlari to'g'ridan-to'g'ri Supabase bazasiga yoziladi.</p>
+    
+    <form id="addTeacherForm">
+      <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--color-gold-400);">➕ Yangi Ustoz Qo'shish</h3>
+      
+      <div class="form-group">
+        <label>To'liq F.I.Sh:</label>
+        <input type="text" id="tName" placeholder="Masalan: Anvar Karimov" required>
+      </div>
+
+      <div class="form-group">
+        <label>Fani / Lavozimi:</label>
+        <input type="text" id="tSubject" placeholder="Masalan: Matematika o'qituvchisi" required>
+      </div>
+
+      <div class="form-group">
+        <label>Ustoz haqida ma'lumot (Bio):</label>
+        <textarea id="tBio" rows="3" placeholder="Tajribasi..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Bazaga Saqlash</button>
+    </form>
+
+    <div style="margin-top: 30px; text-align: center; display: flex; justify-content: space-between; gap: 10px;">
+      <button type="button" onclick="logoutAdmin()" class="btn btn-secondary" style="border-color: #ff4d4d; color: #ff4d4d; width: 50%;">🔒 Chiqish</button>
+      <a href="index.html" class="btn btn-secondary" style="width: 50%;">⬅️ Saytni Ko'rish</a>
+    </div>
+  </div>
+
+  <script>
+    const MY_SECRET_PASSWORD = "84maktab_super_admin_2026"; // O'z parolingiz
+
+    function verifyAdmin() {
+      const inputPass = document.getElementById('adminPassword').value;
+      if (inputPass === MY_SECRET_PASSWORD) {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      }
+    });
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('isLoggedIn');
+      location.reload();
+    }
+
+    // Supabase ulanishi
+    const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'z anon keyingiz
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = document.getElementById('tName').value;
+      const subject = document.getElementById('tSubject').value;
+      const bio = document.getElementById('tBio').value;
+
+      const { error } = await supabaseClient
+        .from('teachers')
+        .insert([{ full_name, subject, bio }]);
+
+      if (error) {
+        alert('Xatolik: ' + error.message);
+      } else {
+        alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
+        document.getElementById('addTeacherForm').reset();
+      }
+    });
+  </script>
+
+</body>
+</html>
