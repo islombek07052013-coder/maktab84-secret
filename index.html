@@ -43,7 +43,6 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(212, 175, 55, 0.2); font-size: 0.9rem; }
     th { color: var(--color-gold-300); background: rgba(0,0,0,0.5); }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -74,15 +73,15 @@
         <label>Ma'lumot (Toifasi):</label>
         <input type="text" id="tBio" placeholder="Masalan: Oliy toifali pedagog" required>
       </div>
-      <button type="submit" class="btn btn-primary">💾 Bazaga Saqlash</button>
+      <button type="submit" class="btn btn-primary">💾 Saqlash</button>
     </form>
 
     <div style="margin-top: 25px;">
-      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Bazadagi Ustozlar Ro'yxati</h4>
+      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Barcha Ustozlar Ro'yxati</h4>
       <div id="adminTeachersList">Yuklanmoqda...</div>
     </div>
 
-    <!-- 2. DARS JADVALINI BOSHQARISH -->
+    <!-- 2. DARS JADVALINI BOSHQARISH (1-11 A, B, V) -->
     <div class="section-divider">
       <form id="addScheduleForm">
         <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini Qo'shish / O'zgartirish</h3>
@@ -157,10 +156,69 @@
 
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
-    // SUPABASE INTEGRATSIYASI
-    const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_VognYDaFhX7B_WRkMs1SDA_BfVmnkiT';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // 37 ta haqiqiy ustozlar ro'yxati
+    const defaultTeachersList = [
+      { id: 1, full_name: "Ismayilov Sherzod Chorievich", subject: "Maktab Direktori", bio: "Oliy toifali pedagog" },
+      { id: 2, full_name: "Soatov Faxriddin Abdurayimovich", subject: "O'IBDO'", bio: "Oliy toifa" },
+      { id: 3, full_name: "Mitanov Sherzod Erkinovich", subject: "MMIBDO'", bio: "Oliy toifa" },
+      { id: 4, full_name: "Alimardonova Muyassar Yaxshibaevna", subject: "O'IBDO' / Matematika", bio: "Oliy toifa" },
+      { id: 5, full_name: "Yo'ldosheva Madina Hasanovna", subject: "Psixolog", bio: "Mutaxassis" },
+      { id: 6, full_name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar bo'yicha menejer", bio: "Mutaxassis" },
+      { id: 7, full_name: "Rustamov Akram Xolmuminovich", subject: "ChQBT rahbari", bio: "Mutaxassis" },
+      { id: 8, full_name: "Ismailova Dildora Chorievna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "1-toifa" },
+      { id: 9, full_name: "Erdonova Feruza Xolbrevna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
+      { id: 10, full_name: "Avazova Xurshida Normurotovna", subject: "Ona tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
+      { id: 11, full_name: "Eshonqulova Afifabonu Tulqin qizi", subject: "Rus tili va adabiyoti o'qituvchisi", bio: "1-toifa" },
+      { id: 12, full_name: "Mamajonova Nilufar Abdubannon qizi", subject: "Rus tili va adabiyoti o'qituvchisi", bio: "2-toifa" },
+      { id: 13, full_name: "Mardanova Zarnigor Alisher qizi", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
+      { id: 14, full_name: "Karimov Abdulxofiz Abduvaxob o'g'li", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
+      { id: 15, full_name: "Isroilova Jamila", subject: "Ingliz tili o'qituvchisi", bio: "1-toifa" },
+      { id: 16, full_name: "Sultonmurodov Erkin Abdug'aniyevich", subject: "Matematika o'qituvchisi", bio: "Oliy toifa" },
+      { id: 17, full_name: "Chorieva Dildora Mamatmurotovna", subject: "Matematika o'qituvchisi", bio: "1-toifa" },
+      { id: 18, full_name: "Safarova Saboxat Muxammadievna", subject: "Matematika o'qituvchisi", bio: "2-toifa" },
+      { id: 19, full_name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o'qituvchisi", bio: "1-toifa" },
+      { id: 20, full_name: "Nosirjona Laylo Abdusalom qizi", subject: "Informatika o'qituvchisi", bio: "Mutaxassis" },
+      { id: 21, full_name: "Ochilova Zulayxo Jahongir qizi", subject: "Fizika va Astronomiya o'qituvchisi", bio: "Mutaxassis" },
+      { id: 22, full_name: "Omonov Umid O'ral o'g'li", subject: "Tabiiy fan va Fizika o'qituvchisi", bio: "Mutaxassis" },
+      { id: 23, full_name: "Nasrullaev Ravshan Yangibaevich", subject: "Tarbiya o'qituvchisi", bio: "1-toifa" },
+      { id: 24, full_name: "Xasanov Xushnud Turg'unovich", subject: "Tarix o'qituvchisi", bio: "1-toifa" },
+      { id: 25, full_name: "Bakirov Sherali Ubaydullaevich", subject: "Biologiya o'qituvchisi", bio: "2-toifa" },
+      { id: 26, full_name: "Shinaev Abdiraim Eshpo'latovich", subject: "Kimyo o'qituvchisi", bio: "2-toifa" },
+      { id: 27, full_name: "Jo'raeva Shaxlo Abdurayimovna", subject: "Geografiya o'qituvchisi", bio: "Oliy toifa" },
+      { id: 28, full_name: "Ergasheva Pokiza Anvar qizi", subject: "Geografiya o'qituvchisi", bio: "2-toifa" },
+      { id: 29, full_name: "Xaydarov Muhammad Zahriddinovich", subject: "Musiqa o'qituvchisi", bio: "Oliy toifa" },
+      { id: 30, full_name: "Fayzullaeva Iqbol Boyburievna", subject: "Tasviriy san'at o'qituvchisi", bio: "Oliy toifa" },
+      { id: 31, full_name: "Terkashov Sirojiddin Abdusamatovich", subject: "Tasviriy san'at va chizmachilik o'qituvchisi", bio: "1-toifa" },
+      { id: 32, full_name: "Normuminov Ulugbek Tojimurotovich", subject: "Jismoniy tarbiya o'qituvchisi", bio: "1-toifa" },
+      { id: 33, full_name: "Akramov Xumoiddin Akmal o'g'li", subject: "Jismoniy tarbiya o'qituvchisi", bio: "1-toifa" },
+      { id: 34, full_name: "Davlatova Etibor Abdunazarovna", subject: "Boshlang'ich sinf o'qituvchisi", bio: "Oliy toifa" },
+      { id: 35, full_name: "Normurodova Dilrabo Erkin qizi", subject: "Boshlang'ich sinf o'qituvchisi", bio: "1-toifa" },
+      { id: 36, full_name: "Irismatova Dilbar Chorievna", subject: "Boshlang'ich sinf o'qituvchisi", bio: "1-toifa" },
+      { id: 37, full_name: "Jumaeva Sharifa Umarali qizi", subject: "Boshlang'ich sinf o'qituvchisi", bio: "2-toifa" }
+    ];
+
+    function getStoredTeachers() {
+      const data = localStorage.getItem('school_teachers_v3');
+      if (!data) {
+        localStorage.setItem('school_teachers_v3', JSON.stringify(defaultTeachersList));
+        return defaultTeachersList;
+      }
+      return JSON.parse(data);
+    }
+
+    function getStoredSchedules() {
+      const data = localStorage.getItem('school_schedules_v3');
+      if (!data) {
+        const defaults = [
+          { id: 1, class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, O'qish, Jismoniy tarbiya, Odobnoma" },
+          { id: 2, class_name: "5-A sinf", day: "Dushanba", lessons: "Matematika, Ona tili, Ingliz tili, Tarix" },
+          { id: 3, class_name: "11-A sinf", day: "Dushanba", lessons: "Algebra, Fizika, Kimyo, Tarix, Ingliz tili" }
+        ];
+        localStorage.setItem('school_schedules_v3', JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(data);
+    }
 
     function loadAdminData() {
       loadAdminTeachers();
@@ -168,24 +226,31 @@
     }
 
     // Ustoz qo'shish
-    document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
+    document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const { error } = await supabaseClient.from('teachers').insert([{
+      const teachers = getStoredTeachers();
+      const newTeacher = {
+        id: Date.now(),
         full_name: document.getElementById('tName').value,
         subject: document.getElementById('tSubject').value,
         bio: document.getElementById('tBio').value
-      }]);
-      if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Ustoz bazaga saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
+      };
+      teachers.push(newTeacher);
+      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
+      alert('✅ Ustoz muvaffaqiyatli qo\'shildi!');
+      document.getElementById('addTeacherForm').reset();
+      loadAdminTeachers();
     });
 
     // Ustozlarni chiqarish
-    async function loadAdminTeachers() {
+    function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
-      let { data: teachers, error } = await supabaseClient.from('teachers').select('*');
+      const teachers = getStoredTeachers();
       
-      if (error) { listContainer.innerHTML = 'Xatolik yuz berdi: ' + error.message; return; }
-      if (!teachers || teachers.length === 0) { listContainer.innerHTML = 'Hozircha bazada ustozlar yo\'q.'; return; }
+      if (teachers.length === 0) {
+        listContainer.innerHTML = 'Hozircha ustozlar yo\'q.';
+        return;
+      }
 
       listContainer.innerHTML = '';
       teachers.forEach(t => {
@@ -202,30 +267,37 @@
       });
     }
 
-    async function deleteTeacher(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      await supabaseClient.from('teachers').delete().eq('id', id);
+    function deleteTeacher(id) {
+      if (!confirm("Haqiqatan ham bu ustozni o'chirmoqchimisiz?")) return;
+      let teachers = getStoredTeachers();
+      teachers = teachers.filter(t => t.id !== id);
+      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
       loadAdminTeachers();
     }
 
     // Dars jadvalini qo'shish
-    document.getElementById('addScheduleForm').addEventListener('submit', async (e) => {
+    document.getElementById('addScheduleForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const { error } = await supabaseClient.from('schedules').insert([{
+      const schedules = getStoredSchedules();
+      const newSchedule = {
+        id: Date.now(),
         class_name: document.getElementById('sClass').value,
         day: document.getElementById('sDay').value,
         lessons: document.getElementById('sLessons').value
-      }]);
-      if (error) alert('Xatolik: ' + error.message);
-      else { alert('✅ Dars jadvali saqlandi!'); document.getElementById('addScheduleForm').reset(); loadAdminSchedules(); }
+      };
+      schedules.push(newSchedule);
+      localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
+      alert('✅ Dars jadvali saqlandi!');
+      document.getElementById('addScheduleForm').reset();
+      loadAdminSchedules();
     });
 
     // Dars jadvallarini chiqarish
-    async function loadAdminSchedules() {
+    function loadAdminSchedules() {
       const listContainer = document.getElementById('adminScheduleList');
-      let { data: schedules, error } = await supabaseClient.from('schedules').select('*');
+      const schedules = getStoredSchedules();
 
-      if (error || !schedules || schedules.length === 0) {
+      if (schedules.length === 0) {
         listContainer.innerHTML = 'Hozircha dars jadvallari kiritilmagan.';
         return;
       }
@@ -254,9 +326,11 @@
       });
     }
 
-    async function deleteSchedule(id) {
+    function deleteSchedule(id) {
       if (!confirm("O'chirmoqchimisiz?")) return;
-      await supabaseClient.from('schedules').delete().eq('id', id);
+      let schedules = getStoredSchedules();
+      schedules = schedules.filter(s => s.id !== id);
+      localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
       loadAdminSchedules();
     }
   </script>
