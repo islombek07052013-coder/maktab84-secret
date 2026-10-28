@@ -143,7 +143,7 @@
     function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
     const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // O'zingizning Supabase anon kalitingizni yozasiz
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function loadAdminData() {
@@ -163,11 +163,25 @@
       else { alert('✅ Muvaffaqiyatli saqlandi!'); document.getElementById('addTeacherForm').reset(); loadAdminTeachers(); }
     });
 
-    // Ustozlarni chiqarish
+    // Ustozlarni chiqarish (Agar baza bo'sh bo'lsa, avtomatik namuna qo'shib ko'rsatadi)
     async function loadAdminTeachers() {
       const listContainer = document.getElementById('adminTeachersList');
       let { data: teachers } = await supabaseClient.from('teachers').select('*');
-      if (!teachers || teachers.length === 0) { listContainer.innerHTML = 'Hozircha bazada ma\'lumot yo\'q.'; return; }
+      
+      if (!teachers || teachers.length === 0) {
+        // Baza bo'sh bo'lsa, avtomatik bitta namuna qo'shamizki, o'chirishni sinab ko'rasiz
+        await supabaseClient.from('teachers').insert([
+          { full_name: "Maktab Direktori (Namuna)", subject: "Direktor", bio: "O'zgartirish yoki o'chirish mumkin." }
+        ]);
+        let { data: newTeachers } = await supabaseClient.from('teachers').select('*');
+        teachers = newTeachers;
+      }
+
+      if (!teachers || teachers.length === 0) { 
+        listContainer.innerHTML = 'Hozircha bazada ma\'lumot yo\'q.'; 
+        return; 
+      }
+      
       listContainer.innerHTML = '';
       teachers.forEach(t => {
         const item = document.createElement('div');
