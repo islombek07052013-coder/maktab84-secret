@@ -1,350 +1,126 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maxfiy Admin Panel — Denov 84-maktab</title>
-  <style>
-    :root {
-      --color-navy-900: #06111e; 
-      --color-navy-800: #0b1c33;
-      --color-navy-700: #122847; 
-      --color-gold-300: #f3e5ab;
-      --color-gold-400: #d4af37; 
-      --gold-gradient: linear-gradient(135deg, #ffe599 0%, #cda059 50%, #996515 100%);
-      --gold-glow: 0 0 20px rgba(212, 175, 55, 0.25);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: radial-gradient(circle at top center, #0f2546 0%, #06111e 100%);
-      color: #f8fafc;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .admin-container { width: 100%; max-width: 950px; padding: 30px; background: linear-gradient(135deg, #0d223f, #061324); border-radius: 20px; border: 2px solid var(--color-gold-400); box-shadow: var(--gold-glow); color: #fff; margin: 20px 0; }
-    .admin-container h2 { text-align: center; margin-bottom: 25px; color: var(--color-gold-300); font-family: 'Poppins', sans-serif; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--color-gold-300); }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(0,0,0,0.6); color: #fff; font-family: inherit; outline: none; font-size: 1rem; }
-    .login-box { width: 100%; max-width: 400px; padding: 35px; background: #0b1c33; border-radius: 16px; border: 2px solid var(--color-gold-400); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border: 0; border-radius: 999px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-    .btn-primary { background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); width: 100%; margin-top: 10px; }
-    .btn-secondary { background: transparent; border: 2px solid var(--color-gold-400); color: var(--color-gold-300); text-decoration: none; }
-    .btn-secondary:hover { background: var(--color-gold-400); color: #000; }
-    .manage-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(212, 175, 55, 0.2); }
-    .delete-btn { background: #dc2626; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; }
-    .delete-btn:hover { background: #b91c1c; }
-    .section-divider { margin-top: 40px; border-top: 2px dashed rgba(212, 175, 55, 0.3); padding-top: 30px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(212, 175, 55, 0.2); font-size: 0.9rem; }
-    th { color: var(--color-gold-300); background: rgba(0,0,0,0.5); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maktab84-Admin Panel</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-between">
 
-  <!-- Parol Kirish Oynasi -->
-  <div id="loginSection" class="login-box">
-    <h3 style="color: var(--color-gold-300); margin-bottom: 20px;">🔒 Maxfiy Kirish</h3>
-    <input type="password" id="adminPassword" placeholder="Parolni kiriting..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #000; color: #fff; margin-bottom: 15px; text-align: center; outline: none;">
-    <button type="button" onclick="verifyAdmin()" class="btn btn-primary">Kirish</button>
-    <p id="loginError" style="color: #ff4d4d; margin-top: 12px; font-size: 0.9rem; display: none;">❌ Parol noto'g'ri!</p>
-  </div>
-
-  <!-- Asosiy Boshqaruv Paneli -->
-  <div id="adminPanel" class="admin-container" style="display: none;">
-    <h2>🛠️ Denov 84-Maktab Boshqaruv Paneli</h2>
-    
-    <!-- 1. USTOZLARNI BOSHQARISH -->
-    <form id="addTeacherForm">
-      <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">👨‍🏫 Yangi Ustoz Qo'shish / O'chirish</h3>
-      <div class="form-group">
-        <label>To'liq F.I.Sh:</label>
-        <input type="text" id="tName" placeholder="Masalan: Ismayilov Sherzod Chorievich" required>
-      </div>
-      <div class="form-group">
-        <label>Fani / Lavozimi:</label>
-        <input type="text" id="tSubject" placeholder="Masalan: Matematika o'qituvchisi" required>
-      </div>
-      <div class="form-group">
-        <label>Toifasi (Ma'lumot):</label>
-        <input type="text" id="tBio" placeholder="Masalan: Oliy toifa" required>
-      </div>
-      <button type="submit" class="btn btn-primary">💾 Ustozni Qo'shish</button>
-    </form>
-
-    <div style="margin-top: 25px;">
-      <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Ustozlar Ro'yxati (O'chirish imkoniyati bilan)</h4>
-      <div id="adminTeachersList">Yuklanmoqda...</div>
+    <!-- Login Screen (Oldi oyna - Faqat avtorizatsiyadan o'tish uchun) -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Maktab84-Admin</h2>
+            <p class="text-gray-600 mb-6">Tizimga kirish uchun faqat ruxsat etilgan Google akkuntidan foydalaning.</p>
+            
+            <!-- Google Sign-In Button Container -->
+            <div id="g_id_onload"
+                 data-client_id="369994181284-luqe47hhobchgp4h9t7mtbnrg3e0j12j.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin flex justify-center" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
+            
+            <p id="error-msg" class="text-red-500 text-sm mt-4 hidden">Sizda bu tizimga kirish huquqi yo'q!</p>
+        </div>
     </div>
 
-    <!-- 2. DARS JADVALINI BOSHQARISH -->
-    <div class="section-divider">
-      <form id="addScheduleForm">
-        <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">📅 Dars Jadvalini O'zgartirish</h3>
-        <div class="form-group">
-          <label>Sinfni Tanlang (1-11 A, B, V):</label>
-          <select id="sClass" required>
-            <option value="1-A sinf">1-A sinf</option><option value="1-B sinf">1-B sinf</option><option value="1-V sinf">1-V sinf</option>
-            <option value="2-A sinf">2-A sinf</option><option value="2-B sinf">2-B sinf</option><option value="2-V sinf">2-V sinf</option>
-            <option value="3-A sinf">3-A sinf</option><option value="3-B sinf">3-B sinf</option><option value="3-V sinf">3-V sinf</option>
-            <option value="4-A sinf">4-A sinf</option><option value="4-B sinf">4-B sinf</option><option value="4-V sinf">4-V sinf</option>
-            <option value="5-A sinf">5-A sinf</option><option value="5-B sinf">5-B sinf</option><option value="5-V sinf">5-V sinf</option>
-            <option value="6-A sinf">6-A sinf</option><option value="6-B sinf">6-B sinf</option><option value="6-V sinf">6-V sinf</option>
-            <option value="7-A sinf">7-A sinf</option><option value="7-B sinf">7-B sinf</option><option value="7-V sinf">7-V sinf</option>
-            <option value="8-A sinf">8-A sinf</option><option value="8-B sinf">8-B sinf</option><option value="8-V sinf">8-V sinf</option>
-            <option value="9-A sinf">9-A sinf</option><option value="9-B sinf">9-B sinf</option><option value="9-V sinf">9-V sinf</option>
-            <option value="10-A sinf">10-A sinf</option><option value="10-B sinf">10-B sinf</option><option value="10-V sinf">10-V sinf</option>
-            <option value="11-A sinf">11-A sinf</option><option value="11-B sinf">11-B sinf</option><option value="11-V sinf">11-V sinf</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Hafta kuni:</label>
-          <select id="sDay" required>
-            <option value="Dushanba">Dushanba</option>
-            <option value="Seshanba">Seshanba</option>
-            <option value="Chorshanba">Chorshanba</option>
-            <option value="Payshanba">Payshanba</option>
-            <option value="Juma">Juma</option>
-            <option value="Shanba">Shanba</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Darslar ro'yxati (vergul bilan ajratib yozing):</label>
-          <input type="text" id="sLessons" placeholder="Matematika, Ona tili, Jismoniy tarbiya..." required>
-        </div>
-        <button type="submit" class="btn btn-primary">📅 Jadvalni Saqlash</button>
-      </form>
+    <!-- Main Admin Dashboard (Asosiy Panel - Kirgandan keyin ochiladi) -->
+    <div id="admin-dashboard" class="hidden flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white shadow-md p-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Maktab84 Admin Panel</h1>
+            <div class="flex items-center gap-4">
+                <span id="user-email" class="text-sm bg-blue-700 px-3 py-1 rounded-full"></span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Chiqish</button>
+            </div>
+        </header>
 
-      <div style="margin-top: 25px;">
-        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Sinflar Jadvallari</h4>
-        <div id="adminScheduleList">Yuklanmoqda...</div>
-      </div>
+        <!-- Content Area -->
+        <main class="p-6 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
+            <!-- O'qituvchilar boshqaruvi -->
+            <div class="bg-white p-5 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-3 text-gray-700">O'qituvchilar</h3>
+                <p class="text-sm text-gray-500 mb-4">Ma'lumotlar localStorage'da saqlanadi.</p>
+                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">Boshqarish</button>
+            </div>
+
+            <!-- Dars jadvali -->
+            <div class="bg-white p-5 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-3 text-gray-700">Dars jadvali</h3>
+                <p class="text-sm text-gray-500 mb-4">Jadvallarni tahrirlash va yangilash.</p>
+                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">O'zgartirish</button>
+            </div>
+
+            <!-- Xona rasmlari -->
+            <div class="bg-white p-5 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-3 text-gray-700">Xona rasmlari</h3>
+                <p class="text-sm text-gray-500 mb-4">Maktab xonalari galereyasini boshqarish.</p>
+                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">Ko'rish</button>
+            </div>
+        </main>
     </div>
 
-    <!-- 3. XONA RASMLARINI O'ZGARTIRISH -->
-    <div class="section-divider">
-      <form id="addRoomPhotoForm">
-        <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: var(--color-gold-400);">🖼️ Xona Rasmlarini O'zgartirish / Qo'shish</h3>
-        <div class="form-group">
-          <label>Xonani tanlang:</label>
-          <select id="roomName" required>
-            <option value="IT va Kompyuter Xonasi">IT va Kompyuter Xonasi</option>
-            <option value="Tikuvchilik va Dizayn Xonasi">Tikuvchilik va Dizayn Xonasi</option>
-            <option value="Musiqa Xonasi">Musiqa Xonasi</option>
-            <option value="Tasviriy San'at Xonasi">Tasviriy San'at Xonasi</option>
-            <option value="Texnologiya Xonasi">Texnologiya Xonasi</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Rasm havolasi (URL yoki fayl manzili):</label>
-          <input type="text" id="roomImgUrl" placeholder="Masalan: images/it_1.jpg yoki rasm havolasini yoping" required>
-        </div>
-        <button type="submit" class="btn btn-primary">🖼️ Rasmni Yangilash</button>
-      </form>
+    <!-- Footer -->
+    <footer class="bg-white text-center py-4 text-sm text-gray-500 border-t">
+        &copy; 2026 Denov 84-maktab Admin Paneli
+    </footer>
 
-      <div style="margin-top: 25px;">
-        <h4 style="color: var(--color-gold-300); margin-bottom: 12px;">📋 Kiritilgan Xona Rasmlari</h4>
-        <div id="adminRoomsList">Yuklanmoqda...</div>
-      </div>
-    </div>
+    <!-- JavaScript Logic -->
+    <script>
+        const ALLOWED_EMAIL = "islombek07052013@gmail.com";
 
-    <!-- TUGMALAR -->
-    <div style="margin-top: 35px; text-align: center; display: flex; justify-content: space-between; gap: 15px;">
-      <button type="button" onclick="logoutAdmin()" class="btn btn-secondary" style="border-color: #ff4d4d; color: #ff4d4d; width: 50%;">🔒 Chiqish</button>
-      <a href="https://islombek07052013-coder.github.io/84-maktab/" class="btn btn-secondary" style="width: 50%; display: flex; align-items: center; justify-content: center;" target="_blank">⬅️ Asosiy Saytni Ko'rish</a>
-    </div>
-  </div>
+        // Sahifa yuklanganda oldin kirganligini tekshirish
+        window.onload = function() {
+            const savedUser = localStorage.getItem("admin_email");
+            if (savedUser === ALLOWED_EMAIL) {
+                showDashboard(savedUser);
+            }
+        }
 
-  <script>
-    const MY_SECRET_PASSWORD = "84maktab";
+        // Google orqali kirish muvaffaqiyatli bo'lgandagi funksiya
+        function handleCredentialResponse(response) {
+            try {
+                const payload = parseJwt(response.credential);
+                const userEmail = payload.email;
 
-    function verifyAdmin() {
-      if (document.getElementById('adminPassword').value === MY_SECRET_PASSWORD) {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadAdminData();
-      } else {
-        document.getElementById('loginError').style.display = 'block';
-      }
-    }
+                if (userEmail === ALLOWED_EMAIL) {
+                    localStorage.setItem("admin_email", userEmail);
+                    showDashboard(userEmail);
+                } else {
+                    document.getElementById("error-msg").classList.remove("hidden");
+                }
+            } catch (e) {
+                console.error("Xatolik yuz berdi:", e);
+            }
+        }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadAdminData();
-      }
-    });
+        // JWT tokenni o'qish uchun yordamchi funksiya
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
 
-    function logoutAdmin() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
+        // Dashboardni ko'rsatish
+        function showDashboard(email) {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("admin-dashboard").classList.remove("hidden");
+            document.getElementById("user-email").innerText = email;
+        }
 
-    // 1. USTOZLAR
-    const defaultTeachersList = [
-      { id: 1, full_name: "Ismayilov Sherzod Chorievich", subject: "Maktab Direktori", bio: "Oliy toifa" },
-      { id: 2, full_name: "Soatov Faxriddin Abdurayimovich", subject: "O'IBDO'", bio: "Oliy toifa" },
-      { id: 3, full_name: "Mitanov Sherzod Erkinovich", subject: "MMIBDO'", bio: "Oliy toifa" },
-      { id: 4, full_name: "Alimardonova Muyassar Yaxshibaevna", subject: "O'IBDO' / Matematika", bio: "Oliy toifa" },
-      { id: 5, full_name: "Yo'ldosheva Madina Hasanovna", subject: "Psixolog", bio: "Mutaxassis" },
-      { id: 6, full_name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar menejeri", bio: "Mutaxassis" }
-    ];
-
-    function getStoredTeachers() {
-      const data = localStorage.getItem('school_teachers_v3');
-      if (!data) {
-        localStorage.setItem('school_teachers_v3', JSON.stringify(defaultTeachersList));
-        return defaultTeachersList;
-      }
-      return JSON.parse(data);
-    }
-
-    document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      let teachers = getStoredTeachers();
-      teachers.push({
-        id: Date.now(),
-        full_name: document.getElementById('tName').value,
-        subject: document.getElementById('tSubject').value,
-        bio: document.getElementById('tBio').value
-      });
-      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
-      alert('✅ Yangi ustoz qo\'shildi!');
-      document.getElementById('addTeacherForm').reset();
-      loadAdminTeachers();
-    });
-
-    function loadAdminTeachers() {
-      const list = document.getElementById('adminTeachersList');
-      const teachers = getStoredTeachers();
-      if (teachers.length === 0) { list.innerHTML = 'Ustozlar yoq.'; return; }
-      list.innerHTML = '';
-      teachers.forEach(t => {
-        list.innerHTML += `
-          <div class="manage-item">
-            <div><strong>${t.full_name}</strong> - <small style="color:#d4af37;">${t.subject}</small></div>
-            <button class="delete-btn" onclick="deleteTeacher(${t.id})">O'chirish</button>
-          </div>
-        `;
-      });
-    }
-
-    function deleteTeacher(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      let teachers = getStoredTeachers().filter(t => t.id !== id);
-      localStorage.setItem('school_teachers_v3', JSON.stringify(teachers));
-      loadAdminTeachers();
-    }
-
-    // 2. DARS JADVALI
-    function getStoredSchedules() {
-      const data = localStorage.getItem('school_schedules_v3');
-      if (!data) {
-        const defaults = [{ id: 1, class_name: "1-A sinf", day: "Dushanba", lessons: "Ona tili, Matematika, Jismoniy tarbiya" }];
-        localStorage.setItem('school_schedules_v3', JSON.stringify(defaults));
-        return defaults;
-      }
-      return JSON.parse(data);
-    }
-
-    document.getElementById('addScheduleForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      let schedules = getStoredSchedules();
-      const cName = document.getElementById('sClass').value;
-      const sDay = document.getElementById('sDay').value;
-      const sLessons = document.getElementById('sLessons').value;
-
-      const idx = schedules.findIndex(s => s.class_name === cName && s.day === sDay);
-      if (idx > -1) {
-        schedules[idx].lessons = sLessons;
-      } else {
-        schedules.push({ id: Date.now(), class_name: cName, day: sDay, lessons: sLessons });
-      }
-      localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
-      alert('✅ Dars jadvali saqlandi!');
-      loadAdminSchedules();
-    });
-
-    function loadAdminSchedules() {
-      const list = document.getElementById('adminScheduleList');
-      const schedules = getStoredSchedules();
-      if (schedules.length === 0) { list.innerHTML = 'Jadval yoq.'; return; }
-      let html = `<table><tr><th>Sinf</th><th>Kun</th><th>Darslar</th><th>Amal</th></tr>`;
-      schedules.forEach(s => {
-        html += `<tr><td>${s.class_name}</td><td>${s.day}</td><td>${s.lessons}</td><td><button class="delete-btn" style="padding:4px 8px;" onclick="deleteSchedule(${s.id})">O'chirish</button></td></tr>`;
-      });
-      html += `</table>`;
-      list.innerHTML = html;
-    }
-
-    function deleteSchedule(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      let schedules = getStoredSchedules().filter(s => s.id !== id);
-      localStorage.setItem('school_schedules_v3', JSON.stringify(schedules));
-      loadAdminSchedules();
-    }
-
-    // 3. XONA RASMLARI
-    function getStoredRooms() {
-      const data = localStorage.getItem('school_rooms_v1');
-      if (!data) {
-        const defaults = [
-          { id: 1, room: "IT va Kompyuter Xonasi", url: "images/it_1.jpg.jpg" },
-          { id: 2, room: "Tikuvchilik va Dizayn Xonasi", url: "images/sewing_1.jpg.jpg" }
-        ];
-        localStorage.setItem('school_rooms_v1', JSON.stringify(defaults));
-        return defaults;
-      }
-      return JSON.parse(data);
-    }
-
-    document.getElementById('addRoomPhotoForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      let rooms = getStoredRooms();
-      const rName = document.getElementById('roomName').value;
-      const rUrl = document.getElementById('roomImgUrl').value;
-
-      const idx = rooms.findIndex(r => r.room === rName);
-      if (idx > -1) {
-        rooms[idx].url = rUrl;
-      } else {
-        rooms.push({ id: Date.now(), room: rName, url: rUrl });
-      }
-      localStorage.setItem('school_rooms_v1', JSON.stringify(rooms));
-      alert('✅ Xona rasmi yangilandi!');
-      loadAdminRooms();
-    });
-
-    function loadAdminRooms() {
-      const list = document.getElementById('adminRoomsList');
-      const rooms = getStoredRooms();
-      if (rooms.length === 0) { list.innerHTML = 'Rasmlar yoq.'; return; }
-      list.innerHTML = '';
-      rooms.forEach(r => {
-        list.innerHTML += `
-          <div class="manage-item">
-            <div><strong>${r.room}</strong><br><small style="color:#cbd5e1;">${r.url}</small></div>
-            <button class="delete-btn" onclick="deleteRoom(${r.id})">O'chirish</button>
-          </div>
-        `;
-      });
-    }
-
-    function deleteRoom(id) {
-      if (!confirm("O'chirmoqchimisiz?")) return;
-      let rooms = getStoredRooms().filter(r => r.id !== id);
-      localStorage.setItem('school_rooms_v1', JSON.stringify(rooms));
-      loadAdminRooms();
-    }
-
-    function loadAdminData() {
-      loadAdminTeachers();
-      loadAdminSchedules();
-      loadAdminRooms();
-    }
-  </script>
+        // Tizimdan chiqish
+        function logout() {
+            localStorage.removeItem("admin_email");
+            location.reload();
+        }
+    </script>
 </body>
 </html>
