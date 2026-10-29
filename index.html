@@ -116,7 +116,7 @@
                 </div>
                 <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
                     <h3 class="font-bold text-lg text-white mb-4 flex items-center justify-between">
-                        <span>Ustozlar Ro'yxati</span>
+                        <span>Barcha Ustozlar Ro'yxati</span>
                         <span id="t-count" class="text-xs bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30 font-semibold">0 ta</span>
                     </h3>
                     <div class="overflow-x-auto max-h-[420px] overflow-y-auto">
@@ -207,7 +207,47 @@
     <script>
         const ALLOWED_EMAIL = "islombek07052013@gmail.com";
 
+        // Barcha boshlang'ich ustozlarni avtomatik bazaga qo'shish (Agar bo'lmasa)
+        const initialTeachers = [
+            { id: 1, name: "Yo‘ldosheva Madina Hasanovna", subject: "Psixolog", badge: "Mutaxassis", bio: "Maktab psixologi, o'quvchilar bilan individual ishlash tajribasiga ega." },
+            { id: 2, name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar bo‘yicha menejer", badge: "Mutaxassis", bio: "Kadrlar bo'yicha menejer va tashkiliy masalalar mas'uli." },
+            { id: 3, name: "Rustamov Akram Xolmuminovich", subject: "ChQBT rahbari", badge: "Mutaxassis", bio: "ChQBT rahbari va harbiy-vatanparvarlik to'garagi mas'uli." },
+            { id: 4, name: "Ismailova Dildora Chorievna", subject: "Ona tili va adabiyoti o‘qituvchisi", badge: "1-toifa", bio: "Ona tili va adabiyoti fani o'qituvchisi." },
+            { id: 5, name: "Erdonova Feruza Xolbrevna", subject: "Ona tili va adabiyoti o‘qituvchisi", badge: "2-toifa", bio: "Ona tili va adabiyoti o'qituvchisi." },
+            { id: 6, name: "Avazova Xurshida Normurotovna", subject: "Ona tili va adabiyoti o‘qituvchisi", badge: "2-toifa", bio: "Ona tili va adabiyoti o'qituvchisi." },
+            { id: 7, name: "Eshonqulova Afifabonu Tulqin qizi", subject: "Rus tili va adabiyoti o‘qituvchisi", badge: "1-toifa", bio: "Rus tili va adabiyoti o'qituvchisi." },
+            { id: 8, name: "Mamajonova Nilufar Abdubannon qizi", subject: "Rus tili va adabiyoti o‘qituvchisi", badge: "2-toifa", bio: "Rus tili va adabiyoti o'qituvchisi." },
+            { id: 9, name: "Mardanova Zarnigor Alisher qizi", subject: "Ingliz tili o‘qituvchisi", badge: "1-toifa", bio: "Ingliz tili o'qituvchisi, IELTS va xalqaro sertifikat egalari ustoz." },
+            { id: 10, name: "Karimov Abdulxofiz Abduvaxob o‘g‘li", subject: "Ingliz tili o‘qituvchisi", badge: "1-toifa", bio: "Ingliz tili fani o'qituvchisi." },
+            { id: 11, name: "Isroilova Jamila", subject: "Ingliz tili o‘qituvchisi", badge: "1-toifa", bio: "Ingliz tili fani o'qituvchisi." },
+            { id: 12, name: "Sultonmurodov Erkin Abdug`aniyevich", subject: "Matematika o‘qituvchisi", badge: "Oliy toifa", bio: "Matematika fani o'qituvchisi, Olimpiada tayyorlov markazi rahbari." },
+            { id: 13, name: "Chorieva Dildora Mamatmurotovna", subject: "Matematika o‘qituvchisi", badge: "1-toifa", bio: "Matematika fani o'qituvchisi." },
+            { id: 14, name: "Safarova Saboxat Muxammadievna", subject: "Matematika o‘qituvchisi", badge: "2-toifa", bio: "Matematika fani o'qituvchisi." },
+            { id: 15, name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o‘qituvchisi", badge: "1-toifa", bio: "Informatika va IT to'garagi rahbari, maktab veb-sayti va tarmoqlar mas'uli." },
+            { id: 16, name: "Nosirjona Laylo Abdusalom qizi", subject: "Informatika o‘qituvchisi", badge: "Mutaxassis", bio: "Informatika va kompyuter savodxonligi o'qituvchisi." },
+            { id: 17, name: "Ochilova Zulayxo Jahongir qizi", subject: "Fizika va Astronomiya o‘qituvchisi", badge: "Mutaxassis", bio: "Fizika va Astronomiya fani o'qituvchisi." },
+            { id: 18, name: "Omonov Umid O‘ral o‘g‘li", subject: "Tabiiy fan va Fizika o‘qituvchisi", badge: "Mutaxassis", bio: "Tabiiy fanlar va Fizika o'qituvchisi." },
+            { id: 19, name: "Nasrullaev Ravshan Yangibaevich", subject: "Tarbiya o‘qituvchisi", badge: "1-toifa", bio: "Tarbiya va huquqshunoslik fani o'qituvchisi." },
+            { id: 20, name: "Xasanov Xushnud Turg‘unovich", subject: "Tarix o‘qituvchisi", badge: "1-toifa", bio: "Tarix va jamiyatshunoslik fani o'qituvchisi." },
+            { id: 21, name: "Bakirov Sherali Ubaydullaevich", subject: "Biologiya o‘qituvchisi", badge: "2-toifa", bio: "Biologiya va ekologiya fani o'qituvchisi." },
+            { id: 22, name: "Shinaev Abdiraim Eshpo‘latovich", subject: "Kimyo o‘qituvchisi", badge: "2-toifa", bio: "Kimyo fani o'qituvchisi va laboratoriya rahbari." },
+            { id: 23, name: "Jo‘raeva Shaxlo Abdurayimovna", subject: "Geografiya o‘qituvchisi", badge: "Oliy toifa", bio: "Geografiya fani o'qituvchisi." },
+            { id: 24, name: "Ergasheva Pokiza Anvar qizi", subject: "Geografiya o‘qituvchisi", badge: "2-toifa", bio: "Geografiya fani o'qituvchisi." },
+            { id: 25, name: "Xaydarov Muhammad Zahriddinovich", subject: "Musiqa o‘qituvchisi", badge: "Oliy toifa", bio: "Musiqa va san'at to'garagi rahbari." },
+            { id: 26, name: "Fayzullaeva Iqbol Boyburievna", subject: "Tasviriy san’at o‘qituvchisi", badge: "Oliy toifa", bio: "Tasviriy san'at va dizayn fani o'qituvchisi." },
+            { id: 27, name: "Terkashov Sirojiddin Abdusamatovich", subject: "Tasviriy san’at va chizmachilik o‘qituvchisi", badge: "1-toifa", bio: "Tasviriy san'at va chizmachilik o'qituvchisi." },
+            { id: 28, name: "Normuminov Ulugbek Tojimurotovich", subject: "Jismoniy tarbiya o‘qituvchisi", badge: "1-toifa", bio: "Jismoniy tarbiya va sport to'garagi rahbari." },
+            { id: 29, name: "Akramov Xumoiddin Akmal o‘g‘li", subject: "Jismoniy tarbiya o‘qituvchisi", badge: "1-toifa", bio: "Jismoniy tarbiya fani o'qituvchisi." },
+            { id: 30, name: "Davlatova Etibor Abdunazarovna", subject: "Boshlang‘ich sinf o‘qituvchisi", badge: "Oliy toifa", bio: "Boshlang'ich sinf o'qituvchisi." },
+            { id: 31, name: "Normurodova Dilrabo Erkin qizi", subject: "Boshlang‘ich sinf o‘qituvchisi", badge: "1-toifa", bio: "Boshlang'ich sinf o'qituvchisi." },
+            { id: 32, name: "Irismatova Dilbar Chorievna", subject: "Boshlang‘ich sinf o‘qituvchisi", badge: "1-toifa", bio: "Boshlang'ich sinf o'qituvchisi." },
+            { id: 33, name: "Jumaeva Sharifa Umarali qizi", subject: "Boshlang‘ich sinf o‘qituvchisi", badge: "2-toifa", bio: "Boshlang'ich sinf o'qituvchisi." }
+        ];
+
         window.onload = function() {
+            if (!localStorage.getItem("m84_teachers")) {
+                localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
+            }
             if (localStorage.getItem("admin_email") === ALLOWED_EMAIL) {
                 showDashboard();
             }
@@ -270,7 +310,7 @@
             }
         }
 
-        // --- USTOZLAR BOSHQARUVI (Tahrirlash va O'chirish) ---
+        // --- USTOZLAR BOSHQARUVI ---
         function getTeachers() { return JSON.parse(localStorage.getItem("m84_teachers") || "[]"); }
         
         function addTeacher(e) {
@@ -301,11 +341,11 @@
             t.subject = newSubj;
             localStorage.setItem("m84_teachers", JSON.stringify(list));
             renderTeachers();
-            alert("Ustoz ma'lumotlari muvaffaqiyatli yangilandi!");
+            alert("Ustoz ma'lumotlari yangilandi!");
         }
 
         function deleteTeacher(id) {
-            if(confirm("Ushbu ustozni o'chirishga ishonchingiz komilmi?")) {
+            if(confirm("Ushbu ustozni o'chirmoqchimisiz?")) {
                 const updatedList = getTeachers().filter(x => x.id !== id);
                 localStorage.setItem("m84_teachers", JSON.stringify(updatedList));
                 renderTeachers();
@@ -336,7 +376,7 @@
             });
         }
 
-        // --- DARS JADVALI (SCHEDULE.HTML BILAN TO'LIQ MOS) ---
+        // --- DARS JADVALI ---
         function getSchedule() { return JSON.parse(localStorage.getItem("school_schedules_v3") || "[]"); }
         
         function addSchedule(e) {
@@ -351,7 +391,7 @@
             
             localStorage.setItem("school_schedules_v3", JSON.stringify(list));
             renderSchedule(); e.target.reset();
-            alert("Jadval muvaffaqiyatli saqlandi va 2-sahifaga ulandi!");
+            alert("Jadval muvaffaqiyatli saqlandi!");
         }
 
         function deleteSchedule(id) {
