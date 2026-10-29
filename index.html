@@ -159,8 +159,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Darslar ro'yxati</label>
-                            <textarea id="s-details" required rows="4" placeholder="1. Ona tili&#10;2. Matematika" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Darslar ro'yxati (Vergul yoki nuqta-vergul bilan yozing)</label>
+                            <textarea id="s-details" required rows="4" placeholder="Ona tili, Matematika, Fizika" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
                         </div>
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Jadvalni Saqlash</button>
                     </form>
@@ -207,7 +207,7 @@
     <script>
         const ALLOWED_EMAIL = "islombek07052013@gmail.com";
 
-        // Barcha boshlang'ich ustozlarni avtomatik bazaga qo'shish (Agar bo'lmasa)
+        // To'liq 33 ta ustoz ro'yxati
         const initialTeachers = [
             { id: 1, name: "Yo‘ldosheva Madina Hasanovna", subject: "Psixolog", badge: "Mutaxassis", bio: "Maktab psixologi, o'quvchilar bilan individual ishlash tajribasiga ega." },
             { id: 2, name: "Jumaeva Dildora Baxtiyorovna", subject: "Kadrlar bo‘yicha menejer", badge: "Mutaxassis", bio: "Kadrlar bo'yicha menejer va tashkiliy masalalar mas'uli." },
@@ -245,9 +245,12 @@
         ];
 
         window.onload = function() {
-            if (!localStorage.getItem("m84_teachers")) {
+            // Har doim to'liq ro'yxatni yangilab turish (eskirgan 4 talikni o'chirish uchun)
+            const currentTeachers = JSON.parse(localStorage.getItem("m84_teachers") || "[]");
+            if (currentTeachers.length < 10) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
             }
+
             if (localStorage.getItem("admin_email") === ALLOWED_EMAIL) {
                 showDashboard();
             }
@@ -376,22 +379,28 @@
             });
         }
 
-        // --- DARS JADVALI ---
+        // --- DARS JADVALI (Vergul bilan yozish qo'llab-quvvatlandi) ---
         function getSchedule() { return JSON.parse(localStorage.getItem("school_schedules_v3") || "[]"); }
         
         function addSchedule(e) {
             e.preventDefault();
             const class_name = document.getElementById("s-class").value;
             const day = document.getElementById("s-day").value;
-            const lessons = document.getElementById("s-details").value;
+            let rawDetails = document.getElementById("s-details").value;
+            
+            let lessonsFormatted = rawDetails;
+            if (rawDetails.includes(',') || rawDetails.includes(';')) {
+                let items = rawDetails.split(/[,;]+/).map(item => item.trim()).filter(item => item.length > 0);
+                lessonsFormatted = items.map((item, index) => `${index + 1}. ${item}`).join('\n');
+            }
             
             let list = getSchedule();
             list = list.filter(x => !(x.class_name === class_name && x.day === day));
-            list.push({ id: Date.now(), class_name, day, lessons });
+            list.push({ id: Date.now(), class_name, day, lessons: lessonsFormatted });
             
             localStorage.setItem("school_schedules_v3", JSON.stringify(list));
             renderSchedule(); e.target.reset();
-            alert("Jadval muvaffaqiyatli saqlandi!");
+            alert("Jadval muvaffaqiyatli saqlandi va tartiblandi!");
         }
 
         function deleteSchedule(id) {
