@@ -127,7 +127,7 @@
                                     <th class="py-3 px-3">F.I.O</th>
                                     <th class="py-3 px-3">Fani</th>
                                     <th class="py-3 px-3">Toifasi</th>
-                                    <th class="py-3 px-3 text-right">Amal (O'chirish)</th>
+                                    <th class="py-3 px-3 text-right">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody id="teachers-list"></tbody>
@@ -270,7 +270,7 @@
             }
         }
 
-        // --- USTOZLAR LOGIKASI (O'CHIRISH DISSIRTASIYA SIFATIDA TIZIMLANGAN) ---
+        // --- USTOZLAR BOSHQARUVI (Tahrirlash va O'chirish) ---
         function getTeachers() { return JSON.parse(localStorage.getItem("m84_teachers") || "[]"); }
         
         function addTeacher(e) {
@@ -287,8 +287,25 @@
             renderTeachers(); e.target.reset();
         }
 
+        function editTeacher(id) {
+            const list = getTeachers();
+            const t = list.find(x => x.id === id);
+            if(!t) return;
+            
+            const newName = prompt("Yangi F.I.O:", t.name);
+            if(newName === null) return;
+            const newSubj = prompt("Yangi fani / lavozimi:", t.subject);
+            if(newSubj === null) return;
+            
+            t.name = newName;
+            t.subject = newSubj;
+            localStorage.setItem("m84_teachers", JSON.stringify(list));
+            renderTeachers();
+            alert("Ustoz ma'lumotlari muvaffaqiyatli yangilandi!");
+        }
+
         function deleteTeacher(id) {
-            if(confirm("Ushbu ustozni o'chirishga ishonchingiz komilmi? (Saytdan ham avtomatik o'chadi)")) {
+            if(confirm("Ushbu ustozni o'chirishga ishonchingiz komilmi?")) {
                 const updatedList = getTeachers().filter(x => x.id !== id);
                 localStorage.setItem("m84_teachers", JSON.stringify(updatedList));
                 renderTeachers();
@@ -307,37 +324,40 @@
                         <td class="py-3 px-3 font-medium text-white">${t.name}</td>
                         <td class="py-3 px-3 text-blue-400">${t.subject}</td>
                         <td class="py-3 px-3"><span class="bg-blue-600/20 text-blue-300 text-xs px-2.5 py-1 rounded-md border border-blue-500/30">${t.badge}</span></td>
-                        <td class="py-3 px-3 text-right">
-                            <button onclick="deleteTeacher(${t.id})" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1 rounded-lg text-xs transition border border-red-500/20">
-                                <i class="fa-solid fa-trash-can mr-1"></i> O'chirish
+                        <td class="py-3 px-3 text-right space-x-2">
+                            <button onclick="editTeacher(${t.id})" class="bg-yellow-500/10 hover:bg-yellow-600 text-yellow-400 hover:text-white px-2.5 py-1 rounded-lg text-xs transition border border-yellow-500/20">
+                                <i class="fa-solid fa-pen"></i> Tahrir
+                            </button>
+                            <button onclick="deleteTeacher(${t.id})" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white px-2.5 py-1 rounded-lg text-xs transition border border-red-500/20">
+                                <i class="fa-solid fa-trash-can"></i> O'chirish
                             </button>
                         </td>
                     </tr>`;
             });
         }
 
-        // --- DARS JADVALI LOGIKASI ---
-        function getSchedule() { return JSON.parse(localStorage.getItem("m84_schedule") || "[]"); }
+        // --- DARS JADVALI (SCHEDULE.HTML BILAN TO'LIQ MOS) ---
+        function getSchedule() { return JSON.parse(localStorage.getItem("school_schedules_v3") || "[]"); }
         
         function addSchedule(e) {
             e.preventDefault();
-            const className = document.getElementById("s-class").value;
+            const class_name = document.getElementById("s-class").value;
             const day = document.getElementById("s-day").value;
-            const details = document.getElementById("s-details").value;
+            const lessons = document.getElementById("s-details").value;
             
             let list = getSchedule();
-            list = list.filter(x => !(x.className === className && x.day === day));
-            list.push({ id: Date.now(), className, day, details });
+            list = list.filter(x => !(x.class_name === class_name && x.day === day));
+            list.push({ id: Date.now(), class_name, day, lessons });
             
-            localStorage.setItem("m84_schedule", JSON.stringify(list));
+            localStorage.setItem("school_schedules_v3", JSON.stringify(list));
             renderSchedule(); e.target.reset();
-            alert("Jadval muvaffaqiyatli saqlandi!");
+            alert("Jadval muvaffaqiyatli saqlandi va 2-sahifaga ulandi!");
         }
 
         function deleteSchedule(id) {
-            if(confirm("Ushbu jadvalni o'chirmoqchimisiz?")) {
+            if(confirm("Jadvalni o'chirmoqchimisiz?")) {
                 const updatedList = getSchedule().filter(x => x.id !== id);
-                localStorage.setItem("m84_schedule", JSON.stringify(updatedList));
+                localStorage.setItem("school_schedules_v3", JSON.stringify(updatedList));
                 renderSchedule();
             }
         }
@@ -353,14 +373,14 @@
                         <button onclick="deleteSchedule(${s.id})" class="absolute top-3 right-3 text-red-400 hover:text-red-300 text-xs bg-red-500/10 p-1.5 rounded-md border border-red-500/20">
                             <i class="fa-solid fa-trash"></i>
                         </button>
-                        <div class="font-bold text-blue-400 text-base mb-1">${s.className}</div>
+                        <div class="font-bold text-blue-400 text-base mb-1">${s.class_name}</div>
                         <div class="text-xs text-gray-400 font-medium mb-2">${s.day}</div>
-                        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-sans bg-slate-800 p-3 rounded-lg border border-slate-700">${s.details}</pre>
+                        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-sans bg-slate-800 p-3 rounded-lg border border-slate-700">${s.lessons}</pre>
                     </div>`;
             });
         }
 
-        // --- XONA RASMLARI LOGIKASI ---
+        // --- XONA RASMLARI ---
         function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
         
         function addRoomImage(e) {
@@ -381,7 +401,7 @@
         }
 
         function deleteRoom(id) {
-            if(confirm("Bu rasmni o'chirmoqchimisiz?")) {
+            if(confirm("Rasmni o'chirmoqchimisiz?")) {
                 const updatedList = getRooms().filter(x => x.id !== id);
                 localStorage.setItem("m84_rooms", JSON.stringify(updatedList));
                 renderRooms();
