@@ -79,7 +79,7 @@
                     <i class="fa-solid fa-calendar-days"></i> Dars Jadvallari
                 </button>
                 <button onclick="switchTab('times')" id="tab-times" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
-                    <i class="fa-solid fa-clock"></i> Dars Vaqtlari
+                    <i class="fa-solid fa-clock"></i> 2 Smena Vaqtlari
                 </button>
                 <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-images"></i> Xonalar
@@ -93,15 +93,15 @@
                     <form onsubmit="addTeacher(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">F.I.O</label>
-                            <input type="text" id="t-name" required placeholder="Masalan: Toshmatov O." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <input type="text" id="t-name" required placeholder="Masalan: Toshmatov O." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Fani / Lavozimi</label>
-                            <input type="text" id="t-subject" required placeholder="Matematika o'qituvchisi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <input type="text" id="t-subject" required placeholder="Matematika o'qituvchisi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Toifasi</label>
-                            <select id="t-badge" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <select id="t-badge" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
                                 <option value="Oliy toifa">Oliy toifa</option>
                                 <option value="1-toifa">1-toifa</option>
                                 <option value="2-toifa">2-toifa</option>
@@ -110,9 +110,9 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Batafsil ma'lumot (Bio)</label>
-                            <textarea id="t-bio" rows="2" placeholder="Qisqacha..." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
+                            <textarea id="t-bio" rows="2" placeholder="Qisqacha..." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Saqlash</button>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Saqlash</button>
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
@@ -144,19 +144,19 @@
                     <form onsubmit="addSchedule(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Sinf</label>
-                            <select id="s-class" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></select>
+                            <select id="s-class" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Hafta kuni</label>
-                            <select id="s-day" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <select id="s-day" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
                                 <option>Dushanba</option><option>Seshanba</option><option>Chorshanba</option><option>Payshanba</option><option>Juma</option><option>Shanba</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Darslar (vergul bilan)</label>
-                            <textarea id="s-details" required rows="4" placeholder="Ona tili, Matematika, Fizika" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
+                            <textarea id="s-details" required rows="4" placeholder="Ona tili, Matematika, Fizika" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Saqlash</button>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Saqlash</button>
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
@@ -168,36 +168,40 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: DARS VAQTLARI -->
-            <section id="sec-times" class="hidden bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700/60 max-w-2xl mx-auto">
-                <h3 class="font-bold text-lg text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-clock text-blue-400"></i> Dars Vaqtlarini Boshqarish</h3>
-                <p class="text-xs text-gray-400 mb-6">Bu yerdagi vaqtlar 2-sahifadagi dars jadvallarida avtomatik ko'rinadi.</p>
-                <form onsubmit="saveLessonTimes(event)" class="space-y-3">
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">1-soat dars:</label>
-                        <input type="text" id="time-0" value="08:00 – 08:45" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
+            <!-- SECTION 3: DARS VAQTLARI (1 va 2-SMENA) -->
+            <section id="sec-times" class="hidden bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700/60 max-w-4xl mx-auto">
+                <h3 class="font-bold text-lg text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-clock text-blue-400"></i> Ikki Smena Dars Vaqtlarini Boshqarish</h3>
+                <p class="text-xs text-gray-400 mb-6">1-smena va 2-smena dars vaqtlarini shu yerdan o'zgartirishingiz mumkin.</p>
+                
+                <form onsubmit="saveLessonTimes(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 1-smena vaqtlari -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="font-bold text-blue-400 text-sm mb-2">☀️ 1-Smena Vaqtlari</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">1-soat:</span><input type="text" id="s1-0" value="08:00 – 08:45" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">2-soat:</span><input type="text" id="s1-1" value="08:50 – 09:35" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">3-soat:</span><input type="text" id="s1-2" value="09:40 – 10:25" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">4-soat:</span><input type="text" id="s1-3" value="10:30 – 11:15" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">5-soat:</span><input type="text" id="s1-4" value="11:20 – 12:05" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">6-soat:</span><input type="text" id="s1-5" value="12:10 – 12:55" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                            </div>
+                        </div>
+
+                        <!-- 2-smena vaqtlari -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="font-bold text-amber-400 text-sm mb-2">🌙 2-Smena Vaqtlari</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">1-soat:</span><input type="text" id="s2-0" value="13:05 – 13:50" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">2-soat:</span><input type="text" id="s2-1" value="13:55 – 14:40" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">3-soat:</span><input type="text" id="s2-2" value="14:45 – 15:30" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">4-soat:</span><input type="text" id="s2-3" value="15:35 – 16:20" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">5-soat:</span><input type="text" id="s2-4" value="16:25 – 17:10" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                                <div class="flex items-center justify-between"><span class="text-xs text-gray-300">6-soat:</span><input type="text" id="s2-5" value="17:15 – 18:00" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs text-white w-32 outline-none"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">2-soat dars:</label>
-                        <input type="text" id="time-1" value="08:50 – 09:35" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">3-soat dars:</label>
-                        <input type="text" id="time-2" value="09:40 – 10:25" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">4-soat dars:</label>
-                        <input type="text" id="time-3" value="10:30 – 11:15" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">5-soat dars:</label>
-                        <input type="text" id="time-4" value="11:20 – 12:05" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 items-center">
-                        <label class="text-sm font-semibold text-gray-300">6-soat dars:</label>
-                        <input type="text" id="time-5" value="12:10 – 12:55" class="col-span-2 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30 mt-4">Vaqtlarni Saqlash</button>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Barcha Vaqtlarni Saqlash</button>
                 </form>
             </section>
 
@@ -391,26 +395,28 @@
             });
         }
 
-        // --- DARS VAQTLARini SAQLASH ---
+        // --- IKKI SMENA VAQTLARINI SAQLASH ---
         function saveLessonTimes(e) {
             e.preventDefault();
-            let times = [];
+            let s1 = [], s2 = [];
             for(let i=0; i<6; i++) {
-                times.push(document.getElementById("time-" + i).value);
+                s1.push(document.getElementById("s1-" + i).value);
+                s2.push(document.getElementById("s2-" + i).value);
             }
-            localStorage.setItem("m84_lesson_times", JSON.stringify(times));
-            alert("Dars vaqtlari muvaffaqiyatli saqlandi!");
+            localStorage.setItem("m84_s1_times", JSON.stringify(s1));
+            localStorage.setItem("m84_s2_times", JSON.stringify(s2));
+            alert("Ikala smena dars vaqtlari saqlandi!");
         }
 
         function loadTimesToAdmin() {
-            let saved = JSON.parse(localStorage.getItem("m84_lesson_times") || "null");
-            if(!saved) {
-                saved = ["08:00 – 08:45", "08:50 – 09:35", "09:40 – 10:25", "10:30 – 11:15", "11:20 – 12:05", "12:10 – 12:55"];
-            }
-            saved.forEach((t, i) => {
-                let el = document.getElementById("time-" + i);
-                if(el) el.value = t;
-            });
+            let s1 = JSON.parse(localStorage.getItem("m84_s1_times") || "null");
+            let s2 = JSON.parse(localStorage.getItem("m84_s2_times") || "null");
+            
+            if(!s1) s1 = ["08:00 – 08:45", "08:50 – 09:35", "09:40 – 10:25", "10:30 – 11:15", "11:20 – 12:05", "12:10 – 12:55"];
+            if(!s2) s2 = ["13:05 – 13:50", "13:55 – 14:40", "14:45 – 15:30", "15:35 – 16:20", "16:25 – 17:10", "17:15 – 18:00"];
+
+            s1.forEach((t, i) => { let el = document.getElementById("s1-" + i); if(el) el.value = t; });
+            s2.forEach((t, i) => { let el = document.getElementById("s2-" + i); if(el) el.value = t; });
         }
 
         // --- XONALAR ---
