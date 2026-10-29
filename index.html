@@ -1,252 +1,409 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - Denov 84-maktab</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Denov 84-maktab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+<body class="bg-slate-900 text-gray-100 min-h-screen flex flex-col justify-between font-sans">
 
-<div id="login-screen" class="fixed inset-0 bg-slate-900/80 flex items-center justify-center z-50">
-  <form onsubmit="login(event)" class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-3">
-    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl"><i class="fa-solid fa-user-shield"></i></div>
-    <h2 class="text-2xl font-bold text-gray-800">Maktab Admin</h2>
-    <p class="text-sm text-gray-500">GitHub token bilan kiring (faqat shu brauzerda saqlanadi)</p>
-    <input id="token" type="password" required placeholder="github_pat_..." class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
-    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm">Kirish</button>
-    <p id="error-msg" class="hidden text-red-500 text-sm bg-red-50 p-2 rounded-lg border border-red-200">Token noto'g'ri!</p>
-  </form>
-</div>
-
-<div id="admin-dashboard" class="hidden">
-  <header class="bg-blue-600 text-white shadow-lg sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div><h1 class="text-xl font-bold">Denov 84-maktab</h1><p class="text-xs text-blue-200">Admin Boshqaruv Markazi</p></div>
-      <div class="flex gap-2">
-        <a id="site-link" href="#" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded-lg text-sm"><i class="fa-solid fa-globe"></i> Saytni ko'rish</a>
-        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-sm"><i class="fa-solid fa-right-from-bracket"></i> Chiqish</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-    <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
-      <button onclick="switchTab('teachers')" id="tab-teachers" class="px-5 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-chalkboard-user"></i> O'qituvchilar</button>
-      <button onclick="switchTab('schedule')" id="tab-schedule" class="px-5 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-calendar-days"></i> Dars Jadvallari</button>
-      <button onclick="switchTab('rooms')" id="tab-rooms" class="px-5 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-images"></i> Xona Galereyasi</button>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 bg-opacity-90 backdrop-blur-md flex items-center justify-center z-50">
+        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full text-center border border-slate-700">
+            <div class="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-blue-500/30">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-1">84-Maktab Admin</h2>
+            <p class="text-sm text-gray-400 mb-6">Tizimga kirish uchun mas'ul Google hisobingizdan foydalaning</p>
+            
+            <div id="g_id_onload"
+                 data-client_id="369994181284-luqe47hhobchgp4h9t7mtbnrg3e0j12j.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin flex justify-center" data-type="standard" data-size="large" data-theme="dark" data-text="sign_in_with" data-shape="rectangular"></div>
+            
+            <p id="error-msg" class="text-red-400 text-sm mt-4 hidden bg-red-950/50 p-2 rounded-lg border border-red-800">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Sizda bu tizimga kirish huquqi yo'q!
+            </p>
+        </div>
     </div>
 
-    <section id="sec-teachers" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <form onsubmit="addTeacher(event)" class="bg-white p-5 rounded-2xl shadow-sm space-y-3">
-        <h3 class="font-bold text-lg">Ustoz qo'shish</h3>
-        <input id="t-name" required placeholder="F.I.O" class="w-full px-3 py-2 border rounded-lg text-sm">
-        <input id="t-subject" required placeholder="Fani / lavozimi" class="w-full px-3 py-2 border rounded-lg text-sm">
-        <select id="t-badge" class="w-full px-3 py-2 border rounded-lg text-sm"><option>Oliy toifa</option><option>1-toifa</option><option>2-toifa</option><option>Mutaxassis</option></select>
-        <textarea id="t-bio" rows="2" placeholder="Batafsil ma'lumot (bio)" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm">Saqlash</button>
-      </form>
-      <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm">
-        <h3 class="font-bold text-lg mb-3 flex justify-between">Ustozlar ro'yxati <span id="t-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full">0 ta</span></h3>
-        <div class="max-h-[420px] overflow-y-auto"><table class="w-full text-left text-sm text-gray-600"><tbody id="teachers-list"></tbody></table></div>
-      </div>
-    </section>
+    <!-- MAIN DASHBOARD -->
+    <div id="admin-dashboard" class="hidden flex-1 flex flex-col">
+        <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-xl font-bold text-xl shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <div>
+                        <h1 id="header-school-name" class="text-xl font-bold text-white leading-tight">Denov 84-maktab</h1>
+                        <p class="text-xs text-blue-400">Boshqaruv Paneli</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="index.html" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                        <i class="fa-solid fa-globe"></i> Saytni ko'rish
+                    </a>
+                    <button onclick="logout()" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Chiqish
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <section id="sec-schedule" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <form onsubmit="addSchedule(event)" class="bg-white p-5 rounded-2xl shadow-sm space-y-3">
-        <h3 class="font-bold text-lg">Jadval qo'shish / o'zgartirish</h3>
-        <select id="s-class" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
-        <select id="s-day" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
-        <textarea id="s-details" required rows="5" placeholder="1. Ona tili&#10;2. Matematika" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm">Jadvalni saqlash</button>
-      </form>
-      <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm">
-        <h3 class="font-bold text-lg mb-3 flex justify-between">Barcha jadvallar <span id="s-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full">0 ta</span></h3>
-        <div id="schedule-list" class="grid md:grid-cols-2 gap-3 max-h-[450px] overflow-y-auto"></div>
-      </div>
-    </section>
+        <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 space-y-6">
+            
+            <!-- MAKTAB NOMI O'ZGARTIRISH -->
+            <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-bold text-base text-white flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-400"></i> Maktab Nomini O'zgartirish</h3>
+                    <p class="text-xs text-gray-400">Bu yerda kiritilgan nom butun saytda avtomatik yangilanadi.</p>
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <input type="text" id="school-name-input" placeholder="Maktab nomi..." class="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white w-full md:w-80 outline-none focus:border-blue-500">
+                    <button onclick="updateSchoolName()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-600/30 whitespace-nowrap">Saqlash</button>
+                </div>
+            </div>
 
-    <section id="sec-rooms" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white p-5 rounded-2xl shadow-sm space-y-3">
-        <h3 class="font-bold text-lg">Rasm qo'shish</h3>
-        <form onsubmit="addRoomImage(event)" class="space-y-3">
-          <select id="r-room" required class="w-full px-3 py-2 border rounded-lg text-sm"></select>
-          <input type="file" id="r-file" accept="image/*" multiple required class="w-full text-sm text-gray-500">
-          <button id="r-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm">Yuklash</button>
-        </form>
-        <button onclick="addRoom()" class="w-full border border-blue-600 text-blue-600 py-2 rounded-lg text-sm">+ Yangi xona qo'shish</button>
-      </div>
-      <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm">
-        <h3 class="font-bold text-lg mb-3 flex justify-between">Xonalar <span id="r-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full">0 ta</span></h3>
-        <div id="rooms-gallery" class="space-y-4 max-h-[500px] overflow-y-auto"></div>
-      </div>
-    </section>
-  </main>
-</div>
+            <!-- TABS -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
+                <button onclick="switchTab('teachers')" id="tab-teachers" class="tab-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-user"></i> Ustozlar Boshqaruvi
+                </button>
+                <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i> Dars Jadvallari (1-11 Sinflar)
+                </button>
+                <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
+                    <i class="fa-solid fa-images"></i> Xona Galereyasi
+                </button>
+            </div>
 
-<script>
-const REPO = '84-maktab', DAYS = ['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
-let TOKEN = localStorage.getItem('m84_token'), OWNER = localStorage.getItem('m84_owner'), DATA = null, SHA = null;
-const $ = id => document.getElementById(id), v = id => $(id).value.trim();
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const enc = s => btoa(unescape(encodeURIComponent(s))), dec = b => decodeURIComponent(escape(atob(b.replace(/\n/g, ''))));
-const gh = (p, o = {}) => fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${p}`, { cache: 'no-store', ...o, headers: { Authorization: 'Bearer ' + TOKEN, Accept: 'application/vnd.github+json' } });
-const imgUrl = s => /^https?:/.test(s) ? s : `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${s}`;
+            <!-- SECTION 1: O'QITUVCHILAR -->
+            <section id="sec-teachers" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-400"></i> Yangi Ustoz Qo'shish
+                    </h3>
+                    <form onsubmit="addTeacher(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">F.I.O</label>
+                            <input type="text" id="t-name" required placeholder="Masalan: Toshmatov O." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Fani / Lavozimi</label>
+                            <input type="text" id="t-subject" required placeholder="Matematika o'qituvchisi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Toifasi</label>
+                            <select id="t-badge" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                                <option value="Oliy toifa">Oliy toifa</option>
+                                <option value="1-toifa">1-toifa</option>
+                                <option value="2-toifa">2-toifa</option>
+                                <option value="Mutaxassis">Mutaxassis</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Batafsil ma'lumot (Bio)</label>
+                            <textarea id="t-bio" rows="2" placeholder="O'qituvchi haqida qisqacha..." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Ustozni Saqlash</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center justify-between">
+                        <span>Ustozlar Ro'yxati</span>
+                        <span id="t-count" class="text-xs bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30 font-semibold">0 ta</span>
+                    </h3>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-slate-900 text-xs uppercase text-gray-400 border-b border-slate-700 sticky top-0">
+                                <tr>
+                                    <th class="py-3 px-3">#</th>
+                                    <th class="py-3 px-3">F.I.O</th>
+                                    <th class="py-3 px-3">Fani</th>
+                                    <th class="py-3 px-3">Toifasi</th>
+                                    <th class="py-3 px-3 text-right">Amal (O'chirish)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachers-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-function toast(t) {
-  let d = $('toast');
-  if (!d) { d = document.createElement('div'); d.id = 'toast'; d.className = 'fixed bottom-4 right-4 bg-slate-800 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50'; document.body.appendChild(d); }
-  d.textContent = t; d.style.display = 'block'; clearTimeout(d._t); d._t = setTimeout(() => d.style.display = 'none', 4000);
-}
+            <!-- SECTION 2: DARS JADVALI -->
+            <section id="sec-schedule" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-plus text-blue-400"></i> Jadval Qo'shish / Yangilash
+                    </h3>
+                    <form onsubmit="addSchedule(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Sinf</label>
+                            <select id="s-class" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Hafta kuni</label>
+                            <select id="s-day" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                                <option>Dushanba</option>
+                                <option>Seshanba</option>
+                                <option>Chorshanba</option>
+                                <option>Payshanba</option>
+                                <option>Juma</option>
+                                <option>Shanba</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Darslar ro'yxati</label>
+                            <textarea id="s-details" required rows="4" placeholder="1. Ona tili&#10;2. Matematika" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Jadvalni Saqlash</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center justify-between">
+                        <span>Kiritilgan Jadvallar</span>
+                        <span id="s-count" class="text-xs bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30 font-semibold">0 ta</span>
+                    </h3>
+                    <div id="schedule-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto"></div>
+                </div>
+            </section>
 
-window.onload = () => {
-  $('s-class').innerHTML = [...Array(11)].map((_, i) => ['A','B','V'].map(l => `<option value="${i+1}-${l} sinf">${i+1}-${l} sinf</option>`).join('')).join('');
-  $('s-day').innerHTML = DAYS.map(d => `<option>${d}</option>`).join('');
-  switchTab('teachers');
-  if (TOKEN && OWNER) start();
-};
+            <!-- SECTION 3: XONA RASMLARI -->
+            <section id="sec-rooms" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-camera-retro text-blue-400"></i> Yangi Xona Rasmi
+                    </h3>
+                    <form onsubmit="addRoomImage(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Xona Nomi</label>
+                            <input type="text" id="r-title" required placeholder="Masalan: Fizika laboratoriyasi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Rasm fayli</label>
+                            <input type="file" id="r-file" accept="image/*" required class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-600/20 file:text-blue-400 font-semibold cursor-pointer">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Rasmni Yuklash</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center justify-between">
+                        <span>Galereya Rasmlari</span>
+                        <span id="r-count" class="text-xs bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30 font-semibold">0 ta</span>
+                    </h3>
+                    <div id="rooms-gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[420px] overflow-y-auto"></div>
+                </div>
+            </section>
 
-async function login(e) {
-  e.preventDefault();
-  const t = v('token'), r = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + t } });
-  if (!r.ok) return $('error-msg').classList.remove('hidden');
-  TOKEN = t; OWNER = (await r.json()).login;
-  localStorage.setItem('m84_token', TOKEN); localStorage.setItem('m84_owner', OWNER);
-  start();
-}
-function logout() { localStorage.removeItem('m84_token'); localStorage.removeItem('m84_owner'); location.reload(); }
+        </main>
+    </div>
 
-async function start() {
-  $('login-screen').classList.add('hidden'); $('admin-dashboard').classList.remove('hidden');
-  $('site-link').href = `https://${OWNER}.github.io/${REPO}/`;
-  try { await load(); } catch (err) { alert(err.message); return logout(); }
-  renderAll();
-}
+    <script>
+        const ALLOWED_EMAIL = "islombek07052013@gmail.com";
 
-// data.json: saytning yagona ma'lumot fayli
-async function load() {
-  const r = await gh('contents/data.json');
-  if (r.ok) { const j = await r.json(); SHA = j.sha; DATA = JSON.parse(dec(j.content)); return; }
-  if (r.status !== 404) throw new Error('GitHub xatosi ' + r.status + ': token yoki repozitoriya ruxsatini tekshiring.');
-  // Birinchi marta: mavjud ustozlar va xonalarni index.html dan olamiz
-  const h = await gh('contents/index.html');
-  if (!h.ok) throw new Error(`"${REPO}" repozitoriyasi topilmadi yoki tokenda ruxsat yo'q.`);
-  const doc = new DOMParser().parseFromString(dec((await h.json()).content), 'text/html'), t0 = Date.now();
-  const q = (el, s) => el.querySelector(s)?.textContent.trim() || '';
-  SHA = null;
-  DATA = {
-    teachers: [...doc.querySelectorAll('.featured-teachers-list .teacher-card')].map((c, i) => ({ id: t0 + i, name: q(c, 'h3'), subject: q(c, '.teacher-role'), badge: q(c, '.teacher-badge'), bio: c.dataset.bio || '' })),
-    schedules: [],
-    rooms: [...doc.querySelectorAll('.room-card')].map((c, i) => ({ id: t0 + 1000 + i, title: q(c, 'h3'), badge: q(c, '.room-badge'), desc: q(c, '.room-info p'), images: [c.querySelector('img')?.getAttribute('src')].filter(Boolean) }))
-  };
-}
+        window.onload = function() {
+            if (localStorage.getItem("admin_email") === ALLOWED_EMAIL) {
+                showDashboard();
+            }
+            populateClasses();
+            loadSchoolName();
+        }
 
-async function save() {
-  DATA.schedules.sort((a, b) => a.class_name.localeCompare(b.class_name, 'uz', { numeric: true }) || DAYS.indexOf(a.day) - DAYS.indexOf(b.day));
-  const body = { message: "Admin: ma'lumot yangilandi", content: enc(JSON.stringify(DATA, null, 1)) };
-  if (SHA) body.sha = SHA;
-  const r = await gh('contents/data.json', { method: 'PUT', body: JSON.stringify(body) });
-  if (!r.ok) throw new Error('Saqlanmadi (' + r.status + ')');
-  SHA = (await r.json()).content.sha;
-}
-async function commit() {
-  toast('Saqlanmoqda...');
-  try { await save(); toast("Saqlandi. Sayt 1-2 daqiqada yangilanadi."); }
-  catch (err) { alert(err.message + "\nSahifa ma'lumotlari qayta yuklanadi."); await load(); }
-  renderAll();
-}
+        function handleCredentialResponse(response) {
+            try {
+                const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+                if (payload.email === ALLOWED_EMAIL) {
+                    localStorage.setItem("admin_email", payload.email);
+                    showDashboard();
+                } else {
+                    document.getElementById("error-msg").classList.remove("hidden");
+                }
+            } catch(e) {}
+        }
 
-const ACT = 'px-5 py-2.5 rounded-xl text-sm bg-blue-600 text-white shadow', PAS = 'px-5 py-2.5 rounded-xl text-sm bg-white text-gray-600 border border-gray-200';
-function switchTab(n) {
-  ['teachers', 'schedule', 'rooms'].forEach(t => { $('sec-' + t).classList.toggle('hidden', t !== n); $('tab-' + t).className = t === n ? ACT : PAS; });
-}
-function renderAll() { renderTeachers(); renderSchedule(); renderRooms(); }
+        function showDashboard() {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("admin-dashboard").classList.remove("hidden");
+            renderTeachers(); renderSchedule(); renderRooms(); loadSchoolName();
+        }
 
-// O'qituvchilar
-function renderTeachers() {
-  $('t-count').textContent = DATA.teachers.length + ' ta';
-  $('teachers-list').innerHTML = DATA.teachers.map((t, i) => `<tr class="border-b"><td class="py-2 px-2">${i + 1}</td><td class="py-2 px-2 font-medium">${esc(t.name)}</td><td class="py-2 px-2">${esc(t.subject)}</td><td class="py-2 px-2">${esc(t.badge)}</td><td class="py-2 px-2 text-right"><button onclick="deleteTeacher(${t.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('') || '<tr><td class="py-4 text-center text-gray-400">Ustozlar yo\'q</td></tr>';
-}
-async function addTeacher(e) {
-  e.preventDefault();
-  DATA.teachers.push({ id: Date.now(), name: v('t-name'), subject: v('t-subject'), badge: v('t-badge'), bio: v('t-bio') });
-  e.target.reset(); await commit();
-}
-async function deleteTeacher(id) {
-  if (!confirm("Bu ustozni o'chirmoqchimisiz?")) return;
-  DATA.teachers = DATA.teachers.filter(x => x.id !== id); await commit();
-}
+        function logout() { localStorage.removeItem("admin_email"); location.reload(); }
 
-// Dars jadvali
-function renderSchedule() {
-  $('s-count').textContent = DATA.schedules.length + ' ta';
-  $('schedule-list').innerHTML = DATA.schedules.map(s => `<div class="border rounded-xl p-3 bg-slate-50 relative"><button onclick="deleteSchedule(${s.id})" class="absolute top-2 right-2 text-red-500"><i class="fa-solid fa-trash"></i></button><div class="font-bold text-blue-600">${esc(s.class_name)}</div><div class="text-xs text-gray-500 mb-1">${esc(s.day)}</div><pre class="text-xs font-sans whitespace-pre-wrap">${esc(s.lessons)}</pre></div>`).join('') || '<div class="text-gray-400 col-span-full text-center">Jadval kiritilmagan</div>';
-}
-async function addSchedule(e) {
-  e.preventDefault();
-  const class_name = v('s-class'), day = v('s-day');
-  DATA.schedules = DATA.schedules.filter(x => !(x.class_name === class_name && x.day === day));
-  DATA.schedules.push({ id: Date.now(), class_name, day, lessons: $('s-details').value.trim() });
-  e.target.reset(); await commit();
-}
-async function deleteSchedule(id) {
-  if (!confirm("Jadvalni o'chirmoqchimisiz?")) return;
-  DATA.schedules = DATA.schedules.filter(x => x.id !== id); await commit();
-}
+        function switchTab(name) {
+            ['teachers', 'schedule', 'rooms'].forEach(t => {
+                document.getElementById('sec-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).className = "tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2";
+            });
+            document.getElementById('sec-' + name).classList.remove('hidden');
+            document.getElementById('tab-' + name).className = "tab-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-blue-600/20 flex items-center gap-2";
+        }
 
-// Xona rasmlari
-function renderRooms() {
-  $('r-count').textContent = DATA.rooms.length + ' ta';
-  $('r-room').innerHTML = DATA.rooms.map(r => `<option value="${r.id}">${esc(r.title)}</option>`).join('');
-  $('rooms-gallery').innerHTML = DATA.rooms.map(r => `<div class="border rounded-xl p-3 bg-slate-50"><div class="flex justify-between mb-2"><b>${esc(r.title)}</b><button onclick="deleteRoom(${r.id})" class="text-red-500 text-xs">Xonani o'chirish</button></div><div class="grid grid-cols-3 md:grid-cols-4 gap-2">${r.images.map((s, k) => `<div class="relative"><img src="${esc(imgUrl(s))}" class="w-full h-20 object-cover rounded">${k ? `<button onclick="setCover(${r.id},${k})" title="Asosiy rasm qilish" class="absolute bottom-1 left-1 bg-white/90 rounded px-1 text-xs">★</button>` : '<span class="absolute bottom-1 left-1 bg-yellow-400 rounded px-1 text-xs">asosiy</span>'}<button onclick="deleteImage(${r.id},${k})" class="absolute top-1 right-1 bg-red-500 text-white rounded px-1.5 text-xs">✕</button></div>`).join('') || '<span class="text-xs text-gray-400">Rasm yo\'q</span>'}</div></div>`).join('');
-}
-function toJpeg(file) {
-  return new Promise((res, rej) => {
-    const im = new Image();
-    im.onload = () => {
-      const k = Math.min(1, 1400 / Math.max(im.width, im.height)), c = document.createElement('canvas');
-      c.width = im.width * k; c.height = im.height * k; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-      res(c.toDataURL('image/jpeg', 0.82).split(',')[1]);
-    };
-    im.onerror = rej; im.src = URL.createObjectURL(file);
-  });
-}
-async function removeFile(path) {
-  if (!path.startsWith('images/rooms/')) return; // asl rasmlarga tegmaymiz
-  try { const r = await gh('contents/' + path); if (r.ok) await gh('contents/' + path, { method: 'DELETE', body: JSON.stringify({ message: "Admin: rasm o'chirildi", sha: (await r.json()).sha }) }); } catch (e) {}
-}
-async function addRoomImage(e) {
-  e.preventDefault();
-  const room = DATA.rooms.find(r => r.id == v('r-room')), files = [...$('r-file').files], btn = $('r-btn');
-  btn.disabled = true;
-  for (const [i, f] of files.entries()) {
-    btn.textContent = `Yuklanmoqda ${i + 1}/${files.length}...`;
-    const path = `images/rooms/${Date.now()}-${i}.jpg`;
-    const r = await gh('contents/' + path, { method: 'PUT', body: JSON.stringify({ message: "Admin: rasm qo'shildi", content: await toJpeg(f) }) });
-    if (!r.ok) { alert('Rasm yuklanmadi (' + r.status + ')'); break; }
-    room.images.push(path);
-  }
-  btn.disabled = false; btn.textContent = 'Yuklash'; e.target.reset(); await commit();
-}
-async function addRoom() {
-  const title = (prompt('Yangi xona nomi:') || '').trim();
-  if (!title) return;
-  DATA.rooms.push({ id: Date.now(), title, badge: '🏫 Xona', desc: '', images: [] }); await commit();
-}
-async function deleteRoom(id) {
-  if (!confirm("Xona va uning rasmlari saytdan o'chiriladi. Davom etasizmi?")) return;
-  const r = DATA.rooms.find(x => x.id === id);
-  DATA.rooms = DATA.rooms.filter(x => x.id !== id); await commit();
-  for (const s of r.images) await removeFile(s);
-}
-async function deleteImage(id, k) {
-  if (!confirm("Bu rasmni o'chirmoqchimisiz?")) return;
-  const [p] = DATA.rooms.find(x => x.id === id).images.splice(k, 1); await commit(); removeFile(p);
-}
-async function setCover(id, k) {
-  const im = DATA.rooms.find(x => x.id === id).images; im.unshift(im.splice(k, 1)[0]); await commit();
-}
-</script>
+        function loadSchoolName() {
+            const name = localStorage.getItem("m84_school_name") || "Denov 84-maktab";
+            document.getElementById("header-school-name").innerText = name;
+            document.getElementById("school-name-input").value = name;
+        }
+
+        function updateSchoolName() {
+            const val = document.getElementById("school-name-input").value;
+            if(val) {
+                localStorage.setItem("m84_school_name", val);
+                loadSchoolName();
+                alert("Maktab nomi muvaffaqiyatli o'zgartirildi!");
+            }
+        }
+
+        function populateClasses() {
+            const select = document.getElementById("s-class");
+            if(!select) return;
+            select.innerHTML = "";
+            for(let i=1; i<=11; i++) {
+                ['A', 'B', 'V'].forEach(l => {
+                    select.innerHTML += `<option value="${i}-${l} sinf">${i}-${l} sinf</option>`;
+                });
+            }
+        }
+
+        // --- USTOZLAR LOGIKASI (O'CHIRISH DISSIRTASIYA SIFATIDA TIZIMLANGAN) ---
+        function getTeachers() { return JSON.parse(localStorage.getItem("m84_teachers") || "[]"); }
+        
+        function addTeacher(e) {
+            e.preventDefault();
+            const list = getTeachers();
+            list.push({ 
+                id: Date.now(), 
+                name: document.getElementById("t-name").value, 
+                subject: document.getElementById("t-subject").value, 
+                badge: document.getElementById("t-badge").value,
+                bio: document.getElementById("t-bio").value 
+            });
+            localStorage.setItem("m84_teachers", JSON.stringify(list));
+            renderTeachers(); e.target.reset();
+        }
+
+        function deleteTeacher(id) {
+            if(confirm("Ushbu ustozni o'chirishga ishonchingiz komilmi? (Saytdan ham avtomatik o'chadi)")) {
+                const updatedList = getTeachers().filter(x => x.id !== id);
+                localStorage.setItem("m84_teachers", JSON.stringify(updatedList));
+                renderTeachers();
+            }
+        }
+
+        function renderTeachers() {
+            const list = getTeachers();
+            document.getElementById("t-count").innerText = list.length + " ta";
+            const tbody = document.getElementById("teachers-list");
+            tbody.innerHTML = list.length ? "" : `<tr><td colspan="5" class="text-center py-6 text-gray-500">Hozircha ustozlar kiritilmagan</td></tr>`;
+            list.forEach((t, i) => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                        <td class="py-3 px-3 text-gray-500 font-semibold">${i+1}</td>
+                        <td class="py-3 px-3 font-medium text-white">${t.name}</td>
+                        <td class="py-3 px-3 text-blue-400">${t.subject}</td>
+                        <td class="py-3 px-3"><span class="bg-blue-600/20 text-blue-300 text-xs px-2.5 py-1 rounded-md border border-blue-500/30">${t.badge}</span></td>
+                        <td class="py-3 px-3 text-right">
+                            <button onclick="deleteTeacher(${t.id})" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1 rounded-lg text-xs transition border border-red-500/20">
+                                <i class="fa-solid fa-trash-can mr-1"></i> O'chirish
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // --- DARS JADVALI LOGIKASI ---
+        function getSchedule() { return JSON.parse(localStorage.getItem("m84_schedule") || "[]"); }
+        
+        function addSchedule(e) {
+            e.preventDefault();
+            const className = document.getElementById("s-class").value;
+            const day = document.getElementById("s-day").value;
+            const details = document.getElementById("s-details").value;
+            
+            let list = getSchedule();
+            list = list.filter(x => !(x.className === className && x.day === day));
+            list.push({ id: Date.now(), className, day, details });
+            
+            localStorage.setItem("m84_schedule", JSON.stringify(list));
+            renderSchedule(); e.target.reset();
+            alert("Jadval muvaffaqiyatli saqlandi!");
+        }
+
+        function deleteSchedule(id) {
+            if(confirm("Ushbu jadvalni o'chirmoqchimisiz?")) {
+                const updatedList = getSchedule().filter(x => x.id !== id);
+                localStorage.setItem("m84_schedule", JSON.stringify(updatedList));
+                renderSchedule();
+            }
+        }
+
+        function renderSchedule() {
+            const list = getSchedule();
+            document.getElementById("s-count").innerText = list.length + " ta";
+            const box = document.getElementById("schedule-list");
+            box.innerHTML = list.length ? "" : `<div class="col-span-full text-center py-6 text-gray-500">Jadvallar yo'q</div>`;
+            list.forEach(s => {
+                box.innerHTML += `
+                    <div class="border border-slate-700 bg-slate-900/60 p-4 rounded-xl relative group">
+                        <button onclick="deleteSchedule(${s.id})" class="absolute top-3 right-3 text-red-400 hover:text-red-300 text-xs bg-red-500/10 p-1.5 rounded-md border border-red-500/20">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <div class="font-bold text-blue-400 text-base mb-1">${s.className}</div>
+                        <div class="text-xs text-gray-400 font-medium mb-2">${s.day}</div>
+                        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-sans bg-slate-800 p-3 rounded-lg border border-slate-700">${s.details}</pre>
+                    </div>`;
+            });
+        }
+
+        // --- XONA RASMLARI LOGIKASI ---
+        function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
+        
+        function addRoomImage(e) {
+            e.preventDefault();
+            const title = document.getElementById("r-title").value;
+            const file = document.getElementById("r-file").files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const list = getRooms();
+                    list.push({ id: Date.now(), title, imgSrc: evt.target.result });
+                    localStorage.setItem("m84_rooms", JSON.stringify(list));
+                    renderRooms();
+                };
+                reader.readAsDataURL(file);
+                e.target.reset();
+            }
+        }
+
+        function deleteRoom(id) {
+            if(confirm("Bu rasmni o'chirmoqchimisiz?")) {
+                const updatedList = getRooms().filter(x => x.id !== id);
+                localStorage.setItem("m84_rooms", JSON.stringify(updatedList));
+                renderRooms();
+            }
+        }
+
+        function renderRooms() {
+            const list = getRooms();
+            document.getElementById("r-count").innerText = list.length + " ta";
+            const gallery = document.getElementById("rooms-gallery");
+            gallery.innerHTML = list.length ? "" : `<div class="col-span-full text-center py-6 text-gray-500">Rasmlar yo'q</div>`;
+            list.forEach(r => {
+                gallery.innerHTML += `
+                    <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-900 relative">
+                        <img src="${r.imgSrc}" class="w-full h-32 object-cover">
+                        <div class="p-2.5 flex justify-between items-center text-xs font-semibold text-gray-300">
+                            <span class="truncate">${r.title}</span>
+                            <button onclick="deleteRoom(${r.id})" class="text-red-400 hover:text-red-300 ml-2"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+    </script>
 </body>
 </html>
