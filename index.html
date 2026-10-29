@@ -6,18 +6,22 @@
     <title>Maktab84-Admin Panel</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Ikonkalar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col justify-between">
+<body class="bg-gray-100 min-h-screen flex flex-col justify-between font-sans">
 
-    <!-- Login Screen (Oldi oyna - Faqat avtorizatsiyadan o'tish uchun) -->
-    <div id="login-screen" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Maktab84-Admin</h2>
-            <p class="text-gray-600 mb-6">Tizimga kirish uchun faqat ruxsat etilgan Google akkuntidan foydalaning.</p>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center border border-gray-100">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">Maktab84 Admin</h2>
+            <p class="text-sm text-gray-500 mb-6">Tizimga kirish uchun mas'ul Google hisobingizdan foydalaning</p>
             
-            <!-- Google Sign-In Button Container -->
             <div id="g_id_onload"
                  data-client_id="369994181284-luqe47hhobchgp4h9t7mtbnrg3e0j12j.apps.googleusercontent.com"
                  data-callback="handleCredentialResponse"
@@ -25,56 +29,196 @@
             </div>
             <div class="g_id_signin flex justify-center" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
             
-            <p id="error-msg" class="text-red-500 text-sm mt-4 hidden">Sizda bu tizimga kirish huquqi yo'q!</p>
+            <p id="error-msg" class="text-red-500 text-sm mt-4 hidden bg-red-50 p-2 rounded-lg border border-red-200">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Sizda bu tizimga kirish huquqi yo'q!
+            </p>
         </div>
     </div>
 
-    <!-- Main Admin Dashboard (Asosiy Panel - Kirgandan keyin ochiladi) -->
+    <!-- MAIN DASHBOARD -->
     <div id="admin-dashboard" class="hidden flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-blue-600 text-white shadow-md p-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">Maktab84 Admin Panel</h1>
-            <div class="flex items-center gap-4">
-                <span id="user-email" class="text-sm bg-blue-700 px-3 py-1 rounded-full"></span>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Chiqish</button>
+        <!-- HEADER -->
+        <header class="bg-blue-600 text-white shadow-lg sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white text-blue-600 p-2 rounded-lg font-bold text-xl shadow">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold leading-tight">Denov 84-maktab</h1>
+                        <p class="text-xs text-blue-200">Boshqaruv Paneli</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="user-email" class="text-xs md:text-sm bg-blue-700/60 px-3 py-1.5 rounded-full border border-blue-400/30 flex items-center gap-2">
+                        <i class="fa-solid fa-envelope"></i> <span id="email-text"></span>
+                    </span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-right-from-bracket"></i> Chiqish
+                    </button>
+                </div>
             </div>
         </header>
 
-        <!-- Content Area -->
-        <main class="p-6 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
-            <!-- O'qituvchilar boshqaruvi -->
-            <div class="bg-white p-5 rounded-lg shadow">
-                <h3 class="font-bold text-lg mb-3 text-gray-700">O'qituvchilar</h3>
-                <p class="text-sm text-gray-500 mb-4">Ma'lumotlar localStorage'da saqlanadi.</p>
-                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">Boshqarish</button>
+        <!-- MAIN CONTENT AREA -->
+        <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1">
+            <!-- TAB BUTTONS -->
+            <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
+                <button onclick="switchTab('teachers')" id="tab-teachers" class="tab-btn active-tab bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-user"></i> O'qituvchilar
+                </button>
+                <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-btn bg-white text-gray-600 hover:bg-gray-50 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm border border-gray-200 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i> Dars Jadvali
+                </button>
+                <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-white text-gray-600 hover:bg-gray-50 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm border border-gray-200 flex items-center gap-2">
+                    <i class="fa-solid fa-images"></i> Xona Rasmlari
+                </button>
             </div>
 
-            <!-- Dars jadvali -->
-            <div class="bg-white p-5 rounded-lg shadow">
-                <h3 class="font-bold text-lg mb-3 text-gray-700">Dars jadvali</h3>
-                <p class="text-sm text-gray-500 mb-4">Jadvallarni tahrirlash va yangilash.</p>
-                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">O'zgartirish</button>
-            </div>
+            <!-- SECTION 1: O'QITUVCHILAR -->
+            <section id="sec-teachers" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-600"></i> Yangi O'qituvchi Qo'shish
+                    </h3>
+                    <form onsubmit="addTeacher(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">F.I.O (Ism-sharifi)</label>
+                            <input type="text" id="t-name" required placeholder="Masalan: Aliyev Vali" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Dars beradigan fani</label>
+                            <input type="text" id="t-subject" required placeholder="Masalan: Matematika" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Telefon raqami</label>
+                            <input type="text" id="t-phone" placeholder="+998 90 123 45 67" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Saqlash
+                        </button>
+                    </form>
+                </div>
+                <!-- Table -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center justify-between">
+                        <span><i class="fa-solid fa-list text-blue-600 mr-2"></i> O'qituvchilar Ro'yxati</span>
+                        <span id="t-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">0 ta</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b">
+                                <tr>
+                                    <th class="py-3 px-3">#</th>
+                                    <th class="py-3 px-3">F.I.O</th>
+                                    <th class="py-3 px-3">Fani</th>
+                                    <th class="py-3 px-3">Telefon</th>
+                                    <th class="py-3 px-3 text-right">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachers-list">
+                                <!-- JS dynamic data -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-            <!-- Xona rasmlari -->
-            <div class="bg-white p-5 rounded-lg shadow">
-                <h3 class="font-bold text-lg mb-3 text-gray-700">Xona rasmlari</h3>
-                <p class="text-sm text-gray-500 mb-4">Maktab xonalari galereyasini boshqarish.</p>
-                <button onclick="alert('Tez kunda qo\'shiladi!')" class="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full hover:bg-blue-600">Ko'rish</button>
-            </div>
+            <!-- SECTION 2: DARS JADVALI -->
+            <section id="sec-schedule" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-plus text-blue-600"></i> Jadval Qo'shish
+                    </h3>
+                    <form onsubmit="addSchedule(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Sinf</label>
+                            <input type="text" id="s-class" required placeholder="Masalan: 5-A sinf" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Hafta kuni</label>
+                            <select id="s-day" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option>Dushanba</option>
+                                <option>Seshanba</option>
+                                <option>Chorshanba</option>
+                                <option>Payshanba</option>
+                                <option>Juma</option>
+                                <option>Shanba</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Fanlar va Vaqti</label>
+                            <textarea id="s-details" required rows="3" placeholder="1. Ona tili (08:30)&#10;2. Matematika (09:20)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Saqlash
+                        </button>
+                    </form>
+                </div>
+                <!-- List -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock text-blue-600 mr-2"></i> Kiritilgan Jadvallar</span>
+                        <span id="s-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">0 ta</span>
+                    </h3>
+                    <div id="schedule-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JS dynamic data -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: XONA RASMLARI -->
+            <section id="sec-rooms" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-camera-retro text-blue-600"></i> Rasm Yuklash
+                    </h3>
+                    <form onsubmit="addRoomImage(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Xona nomi / Tavsifi</label>
+                            <input type="text" id="r-title" required placeholder="Masalan: Informatika xonasi" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Rasm tanlang (Kompyuterdan)</label>
+                            <input type="file" id="r-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        </div>
+                        <div class="text-center text-xs text-gray-400 font-semibold uppercase">YOKI</div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Rasm URL havolasi</label>
+                            <input type="url" id="r-url" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition shadow flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-upload"></i> Galereyaga Qo'shish
+                        </button>
+                    </form>
+                </div>
+                <!-- Gallery Grid -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center justify-between">
+                        <span><i class="fa-solid fa-photo-film text-blue-600 mr-2"></i> Galereya</span>
+                        <span id="r-count" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">0 ta rasm</span>
+                    </h3>
+                    <div id="rooms-gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- JS dynamic gallery -->
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white text-center py-4 text-sm text-gray-500 border-t">
-        &copy; 2026 Denov 84-maktab Admin Paneli
+    <!-- FOOTER -->
+    <footer class="bg-white text-center py-4 text-xs text-gray-500 border-t mt-auto">
+        &copy; 2026 Denov 84-maktab Admin Paneli. Barcha huquqlar saqlangan.
     </footer>
 
-    <!-- JavaScript Logic -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const ALLOWED_EMAIL = "islombek07052013@gmail.com";
 
-        // Sahifa yuklanganda oldin kirganligini tekshirish
+        // APP INIT & AUTH CHECK
         window.onload = function() {
             const savedUser = localStorage.getItem("admin_email");
             if (savedUser === ALLOWED_EMAIL) {
@@ -82,7 +226,6 @@
             }
         }
 
-        // Google orqali kirish muvaffaqiyatli bo'lgandagi funksiya
         function handleCredentialResponse(response) {
             try {
                 const payload = parseJwt(response.credential);
@@ -95,11 +238,10 @@
                     document.getElementById("error-msg").classList.remove("hidden");
                 }
             } catch (e) {
-                console.error("Xatolik yuz berdi:", e);
+                console.error("Auth Error:", e);
             }
         }
 
-        // JWT tokenni o'qish uchun yordamchi funksiya
         function parseJwt(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -109,17 +251,191 @@
             return JSON.parse(jsonPayload);
         }
 
-        // Dashboardni ko'rsatish
         function showDashboard(email) {
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("admin-dashboard").classList.remove("hidden");
-            document.getElementById("user-email").innerText = email;
+            document.getElementById("email-text").innerText = email;
+            
+            // Initial data render
+            renderTeachers();
+            renderSchedule();
+            renderRooms();
         }
 
-        // Tizimdan chiqish
         function logout() {
             localStorage.removeItem("admin_email");
             location.reload();
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll("main section").forEach(sec => sec.classList.add("hidden"));
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.className = "tab-btn bg-white text-gray-600 hover:bg-gray-50 px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-sm border border-gray-200 flex items-center gap-2";
+            });
+
+            document.getElementById("sec-" + tabName).classList.remove("hidden");
+            const activeBtn = document.getElementById("tab-" + tabName);
+            activeBtn.className = "tab-btn active-tab bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition shadow flex items-center gap-2";
+        }
+
+        // --- 1. O'QITUVCHILAR LOGIKASI ---
+        function getTeachers() { return JSON.parse(localStorage.getItem("m84_teachers") || "[]"); }
+        function saveTeachers(data) { localStorage.setItem("m84_teachers", JSON.stringify(data)); renderTeachers(); }
+
+        function addTeacher(e) {
+            e.preventDefault();
+            const name = document.getElementById("t-name").value;
+            const subject = document.getElementById("t-subject").value;
+            const phone = document.getElementById("t-phone").value;
+
+            const list = getTeachers();
+            list.push({ id: Date.now(), name, subject, phone });
+            saveTeachers(list);
+
+            e.target.reset();
+        }
+
+        function deleteTeacher(id) {
+            if(confirm("Ushbu o'qituvchini o'chirmoqchimisiz?")) {
+                const list = getTeachers().filter(item => item.id !== id);
+                saveTeachers(list);
+            }
+        }
+
+        function renderTeachers() {
+            const list = getTeachers();
+            document.getElementById("t-count").innerText = list.length + " ta";
+            const tbody = document.getElementById("teachers-list");
+            tbody.innerHTML = "";
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">Hozircha o'qituvchilar kiritilmagan</td></tr>`;
+                return;
+            }
+
+            list.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="py-3 px-3 font-semibold text-gray-400">${index + 1}</td>
+                        <td class="py-3 px-3 font-medium text-gray-800">${item.name}</td>
+                        <td class="py-3 px-3"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs">${item.subject}</span></td>
+                        <td class="py-3 px-3 text-xs text-gray-500">${item.phone || '-'}</td>
+                        <td class="py-3 px-3 text-right">
+                            <button onclick="deleteTeacher(${item.id})" class="text-red-500 hover:text-red-700 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- 2. DARS JADVALI LOGIKASI ---
+        function getSchedule() { return JSON.parse(localStorage.getItem("m84_schedule") || "[]"); }
+        function saveSchedule(data) { localStorage.setItem("m84_schedule", JSON.stringify(data)); renderSchedule(); }
+
+        function addSchedule(e) {
+            e.preventDefault();
+            const className = document.getElementById("s-class").value;
+            const day = document.getElementById("s-day").value;
+            const details = document.getElementById("s-details").value;
+
+            const list = getSchedule();
+            list.push({ id: Date.now(), className, day, details });
+            saveSchedule(list);
+
+            e.target.reset();
+        }
+
+        function deleteSchedule(id) {
+            if(confirm("Jadvalni o'chirmoqchimisiz?")) {
+                const list = getSchedule().filter(item => item.id !== id);
+                saveSchedule(list);
+            }
+        }
+
+        function renderSchedule() {
+            const list = getSchedule();
+            document.getElementById("s-count").innerText = list.length + " ta";
+            const container = document.getElementById("schedule-list");
+            container.innerHTML = "";
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400">Hozircha dars jadvallari yo'q</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                container.innerHTML += `
+                    <div class="border rounded-xl p-4 bg-slate-50 relative group shadow-sm hover:shadow transition">
+                        <button onclick="deleteSchedule(${item.id})" class="absolute top-3 right-3 text-red-400 hover:text-red-600 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="font-bold text-blue-700 text-base mb-1">${item.className}</div>
+                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2"><i class="fa-regular fa-calendar mr-1"></i> ${item.day}</div>
+                        <pre class="text-xs text-gray-700 whitespace-pre-wrap font-sans bg-white p-2.5 rounded-lg border border-gray-200">${item.details}</pre>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 3. XONA RASMLARI LOGIKASI ---
+        function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
+        function saveRooms(data) { localStorage.setItem("m84_rooms", JSON.stringify(data)); renderRooms(); }
+
+        function addRoomImage(e) {
+            e.preventDefault();
+            const title = document.getElementById("r-title").value;
+            const fileInput = document.getElementById("r-file");
+            const urlInput = document.getElementById("r-url").value;
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    saveRoomData(title, e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else if (urlInput) {
+                saveRoomData(title, urlInput);
+            } else {
+                alert("Iltimos, rasm faylini tanlang yoki URL havolasini kiriting!");
+                return;
+            }
+            e.target.reset();
+        }
+
+        function saveRoomData(title, imgSrc) {
+            const list = getRooms();
+            list.push({ id: Date.now(), title, imgSrc });
+            saveRooms(list);
+        }
+
+        function deleteRoom(id) {
+            if(confirm("Rasmni o'chirmoqchimisiz?")) {
+                const list = getRooms().filter(item => item.id !== id);
+                saveRooms(list);
+            }
+        }
+
+        function renderRooms() {
+            const list = getRooms();
+            document.getElementById("r-count").innerText = list.length + " ta rasm";
+            const gallery = document.getElementById("rooms-gallery");
+            gallery.innerHTML = "";
+
+            if (list.length === 0) {
+                gallery.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400">Galereya bo'sh</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                gallery.innerHTML += `
+                    <div class="border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition group relative">
+                        <img src="${item.imgSrc}" alt="${item.title}" class="w-full h-36 object-cover">
+                        <div class="p-2.5 flex justify-between items-center">
+                            <span class="text-xs font-semibold text-gray-700 truncate">${item.title}</span>
+                            <button onclick="deleteRoom(${item.id})" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
         }
     </script>
 </body>
