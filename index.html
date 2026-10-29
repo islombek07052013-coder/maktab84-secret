@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Maktab Boshqaruvi</title>
+    <title>Admin Panel - Denov 84-maktab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -58,15 +58,15 @@
 
         <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 space-y-6">
             
-            <!-- MAKTAB NOMI SOZLAMASI -->
+            <!-- MAKTAB NOMI -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-base text-gray-800"><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Maktab Nomini O'zgartirish</h3>
                     <p class="text-xs text-gray-500">Bu yerda kiritilgan nom butun saytda avtomatik yangilanadi.</p>
                 </div>
                 <div class="flex gap-2 w-full md:w-auto">
-                    <input type="text" id="school-name-input" placeholder="Maktab nomini yozing..." class="px-3 py-2 border rounded-lg text-sm w-full md:w-80 outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="updateSchoolName()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow whitespace-nowrap">Saqlash</button>
+                    <input type="text" id="school-name-input" placeholder="Maktab nomi..." class="px-3 py-2 border rounded-lg text-sm w-full md:w-80 outline-none">
+                    <button onclick="updateSchoolName()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">Saqlash</button>
                 </div>
             </div>
 
@@ -96,13 +96,22 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Fani / Lavozimi</label>
-                            <input type="text" id="t-subject" required placeholder="Masalan: Matematika ustozi" class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
+                            <input type="text" id="t-subject" required placeholder="Matematika o'qituvchisi" class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Telefon raqami</label>
-                            <input type="text" id="t-phone" placeholder="+998..." class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Toifasi</label>
+                            <select id="t-badge" class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
+                                <option value="Oliy toifa">Oliy toifa</option>
+                                <option value="1-toifa">1-toifa</option>
+                                <option value="2-toifa">2-toifa</option>
+                                <option value="Mutaxassis">Mutaxassis</option>
+                            </select>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition shadow">Ustoz Qo'shish</button>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Batafsil ma'lumot (Bio)</label>
+                            <textarea id="t-bio" rows="2" placeholder="Tajribasi haqida..." class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition shadow">Ustozni Saqlash</button>
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -117,7 +126,7 @@
                                     <th class="py-3 px-3">#</th>
                                     <th class="py-3 px-3">F.I.O</th>
                                     <th class="py-3 px-3">Fani</th>
-                                    <th class="py-3 px-3">Tel</th>
+                                    <th class="py-3 px-3">Toifasi</th>
                                     <th class="py-3 px-3 text-right">O'chirish</th>
                                 </tr>
                             </thead>
@@ -135,7 +144,7 @@
                     </h3>
                     <form onsubmit="addSchedule(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Sinfni tanlang (1-11 A,B,V)</label>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Sinfni tanlang</label>
                             <select id="s-class" class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></select>
                         </div>
                         <div>
@@ -266,7 +275,13 @@
         function addTeacher(e) {
             e.preventDefault();
             const list = getTeachers();
-            list.push({ id: Date.now(), name: document.getElementById("t-name").value, subject: document.getElementById("t-subject").value, phone: document.getElementById("t-phone").value });
+            list.push({ 
+                id: Date.now(), 
+                name: document.getElementById("t-name").value, 
+                subject: document.getElementById("t-subject").value, 
+                badge: document.getElementById("t-badge").value,
+                bio: document.getElementById("t-bio").value 
+            });
             localStorage.setItem("m84_teachers", JSON.stringify(list));
             renderTeachers(); e.target.reset();
         }
@@ -282,7 +297,7 @@
             const tbody = document.getElementById("teachers-list");
             tbody.innerHTML = list.length ? "" : `<tr><td colspan="5" class="text-center py-4 text-gray-400">Ustozlar yo'q</td></tr>`;
             list.forEach((t, i) => {
-                tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-3">${i+1}</td><td class="py-2 px-3 font-medium">${t.name}</td><td class="py-2 px-3">${t.subject}</td><td class="py-2 px-3">${t.phone||'-'}</td><td class="py-2 px-3 text-right"><button onclick="deleteTeacher(${t.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr class="border-b"><td class="py-2 px-3">${i+1}</td><td class="py-2 px-3 font-medium">${t.name}</td><td class="py-2 px-3">${t.subject}</td><td class="py-2 px-3">${t.badge}</td><td class="py-2 px-3 text-right"><button onclick="deleteTeacher(${t.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -295,13 +310,12 @@
             const details = document.getElementById("s-details").value;
             
             let list = getSchedule();
-            // Agar shu sinf va kunga oldin kiritilgan bo'lsa, yangilaydi (o'zgartiradi)
             list = list.filter(x => !(x.className === className && x.day === day));
             list.push({ id: Date.now(), className, day, details });
             
             localStorage.setItem("m84_schedule", JSON.stringify(list));
             renderSchedule(); e.target.reset();
-            alert("Jadval muvaffaqiyatli saqlandi/o'zgartirildi!");
+            alert("Jadval muvaffaqiyatli saqlandi!");
         }
         function deleteSchedule(id) {
             if(confirm("Jadvalni o'chirmoqchimisiz?")) {
