@@ -168,14 +168,13 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: DARS VAQTLARI (1 va 2-SMENA) -->
+            <!-- SECTION 3: DARS VAQTLARI -->
             <section id="sec-times" class="hidden bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700/60 max-w-4xl mx-auto">
                 <h3 class="font-bold text-lg text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-clock text-blue-400"></i> Ikki Smena Dars Vaqtlarini Boshqarish</h3>
                 <p class="text-xs text-gray-400 mb-6">1-smena va 2-smena dars vaqtlarini shu yerdan o'zgartirishingiz mumkin.</p>
                 
                 <form onsubmit="saveLessonTimes(event)" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- 1-smena vaqtlari -->
                         <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
                             <h4 class="font-bold text-blue-400 text-sm mb-2">☀️ 1-Smena Vaqtlari</h4>
                             <div class="space-y-2">
@@ -188,7 +187,6 @@
                             </div>
                         </div>
 
-                        <!-- 2-smena vaqtlari -->
                         <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
                             <h4 class="font-bold text-amber-400 text-sm mb-2">🌙 2-Smena Vaqtlari</h4>
                             <div class="space-y-2">
@@ -205,20 +203,21 @@
                 </form>
             </section>
 
-            <!-- SECTION 4: XONALAR -->
+            <!-- SECTION 4: XONA RASMLARI (LINK ORQALI QO'SHISH) -->
             <section id="sec-rooms" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
-                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-camera-retro text-blue-400"></i> Xona Rasmi</h3>
-                    <form onsubmit="addRoomImage(event)" class="space-y-4">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-link text-blue-400"></i> Rasm Linki Orqali Qo'shish</h3>
+                    <form onsubmit="addRoomImageByUrl(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Xona Nomi</label>
-                            <input type="text" id="r-title" required placeholder="Fizika xonasi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none">
+                            <input type="text" id="r-title" required placeholder="Masalan: Fizika xonasi" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Rasm fayli</label>
-                            <input type="file" id="r-file" accept="image/*" required class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-600/20 file:text-blue-400 font-semibold cursor-pointer">
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Rasm Havolasi (URL)</label>
+                            <input type="url" id="r-url" required placeholder="https://example.com/image.jpg" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <p class="text-[11px] text-gray-400 mt-1">Google'dagi rasm ustiga bosib "Rasm manzilini nusxalash" (Copy image address) ni tanlang va shu yerga tashlang.</p>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Yuklash</button>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Rasmni Qo'shish</button>
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
@@ -395,7 +394,7 @@
             });
         }
 
-        // --- IKKI SMENA VAQTLARINI SAQLASH ---
+        // --- IKKI SMENA VAQTLARI ---
         function saveLessonTimes(e) {
             e.preventDefault();
             let s1 = [], s2 = [];
@@ -405,44 +404,43 @@
             }
             localStorage.setItem("m84_s1_times", JSON.stringify(s1));
             localStorage.setItem("m84_s2_times", JSON.stringify(s2));
-            alert("Ikala smena dars vaqtlari saqlandi!");
+            alert("Vaqtlar saqlandi!");
         }
 
         function loadTimesToAdmin() {
             let s1 = JSON.parse(localStorage.getItem("m84_s1_times") || "null");
             let s2 = JSON.parse(localStorage.getItem("m84_s2_times") || "null");
-            
             if(!s1) s1 = ["08:00 – 08:45", "08:50 – 09:35", "09:40 – 10:25", "10:30 – 11:15", "11:20 – 12:05", "12:10 – 12:55"];
             if(!s2) s2 = ["13:05 – 13:50", "13:55 – 14:40", "14:45 – 15:30", "15:35 – 16:20", "16:25 – 17:10", "17:15 – 18:00"];
-
             s1.forEach((t, i) => { let el = document.getElementById("s1-" + i); if(el) el.value = t; });
             s2.forEach((t, i) => { let el = document.getElementById("s2-" + i); if(el) el.value = t; });
         }
 
-        // --- XONALAR ---
+        // --- XONALAR (URL LINK ORQALI) ---
         function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
-        function addRoomImage(e) {
+        
+        function addRoomImageByUrl(e) {
             e.preventDefault();
             const title = document.getElementById("r-title").value;
-            const file = document.getElementById("r-file").files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const list = getRooms();
-                    list.push({ id: Date.now(), title, imgSrc: evt.target.result });
-                    localStorage.setItem("m84_rooms", JSON.stringify(list));
-                    renderRooms();
-                };
-                reader.readAsDataURL(file);
+            const imgSrc = document.getElementById("r-url").value;
+            
+            if(imgSrc) {
+                const list = getRooms();
+                list.push({ id: Date.now(), title, imgSrc });
+                localStorage.setItem("m84_rooms", JSON.stringify(list));
+                renderRooms();
                 e.target.reset();
+                alert("Rasm havolasi muvaffaqiyatli qo'shildi!");
             }
         }
+
         function deleteRoom(id) {
             if(confirm("O'chirmoqchimisiz?")) {
                 localStorage.setItem("m84_rooms", JSON.stringify(getRooms().filter(x => x.id !== id)));
                 renderRooms();
             }
         }
+
         function renderRooms() {
             const list = getRooms();
             document.getElementById("r-count").innerText = list.length + " ta";
@@ -451,10 +449,10 @@
             list.forEach(r => {
                 gallery.innerHTML += `
                     <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-900 relative">
-                        <img src="${r.imgSrc}" class="w-full h-32 object-cover">
+                        <img src="${r.imgSrc}" class="w-full h-32 object-cover" onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600'">
                         <div class="p-2.5 flex justify-between items-center text-xs text-gray-300">
                             <span class="truncate">${r.title}</span>
-                            <button onclick="deleteRoom(${r.id})" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteRoom(${r.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>`;
             });
