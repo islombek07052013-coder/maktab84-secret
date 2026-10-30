@@ -58,7 +58,7 @@
 
         <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 space-y-6">
             
-            <!-- MAKTAB NOMI O'ZGARTIRISH (Faqat Asosiy Adminga chiqishi mumkin yoki hammaga) -->
+            <!-- MAKTAB NOMI O'ZGARTIRISH -->
             <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-base text-white flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-400"></i> Maktab Nomini O'zgartirish</h3>
@@ -84,7 +84,7 @@
                 <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-images"></i> Xonalar
                 </button>
-                <!-- Faqat asosiy admingagina ko'rinadigan Adminlar tugmasi -->
+                <!-- Faqat asosiy adminga ko'rinadigan Adminlar bo'limi -->
                 <button onclick="switchTab('admins')" id="tab-admins" class="tab-btn hidden bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-user-gear"></i> Adminlar
                 </button>
@@ -282,6 +282,7 @@
             if (!localStorage.getItem("m84_teachers")) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
             }
+            // Bazaviy adminlar ro'yxatida faqat siz bo'lasiz
             if (!localStorage.getItem("m84_admins")) {
                 localStorage.setItem("m84_admins", JSON.stringify([MAIN_SUPER_ADMIN]));
             }
@@ -336,7 +337,6 @@
 
         function switchTab(name) {
             const currentEmail = localStorage.getItem("admin_email");
-            // Agar boshqa admin 'admins' bo'limiga kirishga urinsa ruxsat bermaslik
             if (name === 'admins' && currentEmail !== MAIN_SUPER_ADMIN) return;
 
             ['teachers', 'schedule', 'times', 'rooms', 'admins'].forEach(t => {
@@ -464,7 +464,7 @@
             });
         }
 
-        // --- IKKI SMENA VAqTLARI ---
+        // --- IKKI SMENA VAQTLARI ---
         function saveLessonTimes(e) {
             e.preventDefault();
             let s1 = [], s2 = [];
