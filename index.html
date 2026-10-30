@@ -17,7 +17,7 @@
                 <i class="fa-solid fa-user-shield"></i>
             </div>
             <h2 class="text-2xl font-bold text-white mb-1">84-Maktab Admin</h2>
-            <p class="text-sm text-gray-400 mb-6">Tizimga kirish uchun mas'ul Google hisobingizdan foydalaning</p>
+            <p class="text-sm text-gray-400 mb-6">Tizimga kirish uchun ruxsat etilgan Google hisobingizdan foydalaning</p>
             
             <div id="g_id_onload"
                  data-client_id="369994181284-luqe47hhobchgp4h9t7mtbnrg3e0j12j.apps.googleusercontent.com"
@@ -42,7 +42,7 @@
                     </div>
                     <div>
                         <h1 id="header-school-name" class="text-xl font-bold text-white leading-tight">Denov 84-maktab</h1>
-                        <p class="text-xs text-blue-400">Boshqaruv Paneli</p>
+                        <p class="text-xs text-blue-400" id="admin-role-label">Boshqaruv Paneli</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -58,7 +58,7 @@
 
         <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 space-y-6">
             
-            <!-- MAKTAB NOMI O'ZGARTIRISH -->
+            <!-- MAKTAB NOMI O'ZGARTIRISH (Faqat Asosiy Adminga chiqishi mumkin yoki hammaga) -->
             <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-base text-white flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-400"></i> Maktab Nomini O'zgartirish</h3>
@@ -83,6 +83,10 @@
                 </button>
                 <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-images"></i> Xonalar
+                </button>
+                <!-- Faqat asosiy admingagina ko'rinadigan Adminlar tugmasi -->
+                <button onclick="switchTab('admins')" id="tab-admins" class="tab-btn hidden bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear"></i> Adminlar
                 </button>
             </div>
 
@@ -203,7 +207,7 @@
                 </form>
             </section>
 
-            <!-- SECTION 4: XONA RASMLARI (LINK ORQALI QO'SHISH) -->
+            <!-- SECTION 4: XONALAR -->
             <section id="sec-rooms" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
                     <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-link text-blue-400"></i> Rasm Linki Orqali Qo'shish</h3>
@@ -215,7 +219,6 @@
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Rasm Havolasi (URL)</label>
                             <input type="url" id="r-url" required placeholder="https://example.com/image.jpg" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
-                            <p class="text-[11px] text-gray-400 mt-1">Google'dagi rasm ustiga bosib "Rasm manzilini nusxalash" (Copy image address) ni tanlang va shu yerga tashlang.</p>
                         </div>
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Rasmni Qo'shish</button>
                     </form>
@@ -229,11 +232,44 @@
                 </div>
             </section>
 
+            <!-- SECTION 5: ADMINLARNI BOSHQARISH (Faqat Asosiy Adminga ko'rinadi) -->
+            <section id="sec-admins" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-user-plus text-blue-400"></i> Yangi Admin Qo'shish</h3>
+                    <form onsubmit="addAdmin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Google Pochta (Email)</label>
+                            <input type="email" id="admin-email-input" required placeholder="ustoz@gmail.com" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
+                            <p class="text-[11px] text-gray-400 mt-1">Shu pochtaga ega o'qituvchi faqat ma'lumotlarni o'zgartira oladi, lekin boshqa admin qo'sholmaydi.</p>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Adminni Qo'shish</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
+                    <h3 class="font-bold text-lg text-white mb-4 flex items-center justify-between">
+                        <span>Ruxsat etilgan Adminlar</span>
+                        <span id="admin-count" class="text-xs bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30 font-semibold">0 ta</span>
+                    </h3>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-slate-900 text-xs uppercase text-gray-400 border-b border-slate-700 sticky top-0">
+                                <tr>
+                                    <th class="py-3 px-3">#</th>
+                                    <th class="py-3 px-3">Google Pochta (Email)</th>
+                                    <th class="py-3 px-3 text-right">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admins-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
     <script>
-        const ALLOWED_EMAIL = "islombek07052013@gmail.com";
+        const MAIN_SUPER_ADMIN = "islombek07052013@gmail.com";
 
         const initialTeachers = [
             { id: 1, name: "Yo‘ldosheva Madina Hasanovna", subject: "Psixolog", badge: "Mutaxassis", bio: "Maktab psixologi" },
@@ -246,41 +282,75 @@
             if (!localStorage.getItem("m84_teachers")) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
             }
-            if (localStorage.getItem("admin_email") === ALLOWED_EMAIL) {
-                showDashboard();
+            if (!localStorage.getItem("m84_admins")) {
+                localStorage.setItem("m84_admins", JSON.stringify([MAIN_SUPER_ADMIN]));
+            }
+
+            const currentLogged = localStorage.getItem("admin_email");
+            if (currentLogged && isAuthorizedAdmin(currentLogged)) {
+                showDashboard(currentLogged);
             }
             populateClasses();
             loadSchoolName();
             loadTimesToAdmin();
         }
 
+        function getAdmins() {
+            return JSON.parse(localStorage.getItem("m84_admins") || `["${MAIN_SUPER_ADMIN}"]`);
+        }
+
+        function isAuthorizedAdmin(email) {
+            const admins = getAdmins();
+            return admins.includes(email);
+        }
+
         function handleCredentialResponse(response) {
             try {
                 const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-                if (payload.email === ALLOWED_EMAIL) {
+                if (isAuthorizedAdmin(payload.email)) {
                     localStorage.setItem("admin_email", payload.email);
-                    showDashboard();
+                    showDashboard(payload.email);
                 } else {
                     document.getElementById("error-msg").classList.remove("hidden");
                 }
             } catch(e) {}
         }
 
-        function showDashboard() {
+        function showDashboard(email) {
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("admin-dashboard").classList.remove("hidden");
-            renderTeachers(); renderSchedule(); renderRooms(); loadSchoolName(); loadTimesToAdmin();
+
+            // Faqat asosiy adminga "Adminlar" bo'limini ko'rsatish
+            if (email === MAIN_SUPER_ADMIN) {
+                document.getElementById("tab-admins").classList.remove("hidden");
+                document.getElementById("admin-role-label").innerText = "Asosiy Boshqaruv Paneli (Super Admin)";
+            } else {
+                document.getElementById("tab-admins").classList.add("hidden");
+                document.getElementById("admin-role-label").innerText = "Maktab Boshqaruv Paneli (Ustoz Admin)";
+            }
+
+            renderTeachers(); renderSchedule(); renderRooms(); renderAdmins(); loadSchoolName(); loadTimesToAdmin();
         }
 
         function logout() { localStorage.removeItem("admin_email"); location.reload(); }
 
         function switchTab(name) {
-            ['teachers', 'schedule', 'times', 'rooms'].forEach(t => {
-                document.getElementById('sec-' + t).classList.add('hidden');
-                document.getElementById('tab-' + t).className = "tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2";
+            const currentEmail = localStorage.getItem("admin_email");
+            // Agar boshqa admin 'admins' bo'limiga kirishga urinsa ruxsat bermaslik
+            if (name === 'admins' && currentEmail !== MAIN_SUPER_ADMIN) return;
+
+            ['teachers', 'schedule', 'times', 'rooms', 'admins'].forEach(t => {
+                const sec = document.getElementById('sec-' + t);
+                const tab = document.getElementById('tab-' + t);
+                if(sec) sec.classList.add('hidden');
+                if(tab && !(t === 'admins' && currentEmail !== MAIN_SUPER_ADMIN)) {
+                    tab.className = "tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2";
+                }
             });
-            document.getElementById('sec-' + name).classList.remove('hidden');
-            document.getElementById('tab-' + name).className = "tab-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-blue-600/20 flex items-center gap-2";
+            const targetSec = document.getElementById('sec-' + name);
+            const targetTab = document.getElementById('tab-' + name);
+            if(targetSec) targetSec.classList.remove('hidden');
+            if(targetTab) targetTab.className = "tab-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-blue-600/20 flex items-center gap-2";
         }
 
         function loadSchoolName() {
@@ -394,7 +464,7 @@
             });
         }
 
-        // --- IKKI SMENA VAQTLARI ---
+        // --- IKKI SMENA VAqTLARI ---
         function saveLessonTimes(e) {
             e.preventDefault();
             let s1 = [], s2 = [];
@@ -416,14 +486,12 @@
             s2.forEach((t, i) => { let el = document.getElementById("s2-" + i); if(el) el.value = t; });
         }
 
-        // --- XONALAR (URL LINK ORQALI) ---
+        // --- XONALAR ---
         function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
-        
         function addRoomImageByUrl(e) {
             e.preventDefault();
             const title = document.getElementById("r-title").value;
             const imgSrc = document.getElementById("r-url").value;
-            
             if(imgSrc) {
                 const list = getRooms();
                 list.push({ id: Date.now(), title, imgSrc });
@@ -433,14 +501,12 @@
                 alert("Rasm havolasi muvaffaqiyatli qo'shildi!");
             }
         }
-
         function deleteRoom(id) {
             if(confirm("O'chirmoqchimisiz?")) {
                 localStorage.setItem("m84_rooms", JSON.stringify(getRooms().filter(x => x.id !== id)));
                 renderRooms();
             }
         }
-
         function renderRooms() {
             const list = getRooms();
             document.getElementById("r-count").innerText = list.length + " ta";
@@ -455,6 +521,56 @@
                             <button onclick="deleteRoom(${r.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>`;
+            });
+        }
+
+        // --- ADMINLARNI BOSHQARISH (Faqat Asosiy Admin uchun) ---
+        function addAdmin(e) {
+            e.preventDefault();
+            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
+            const emailInput = document.getElementById("admin-email-input").value.trim().toLowerCase();
+            if(!emailInput) return;
+            const admins = getAdmins();
+            if(admins.includes(emailInput)) {
+                alert("Bu pochta allaqachon admin sifatida qo'shilgan!");
+                return;
+            }
+            admins.push(emailInput);
+            localStorage.setItem("m84_admins", JSON.stringify(admins));
+            renderAdmins();
+            e.target.reset();
+            alert("Yangi admin muvaffaqiyatli qo'shildi!");
+        }
+
+        function deleteAdmin(email) {
+            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
+            let admins = getAdmins();
+            if(email === MAIN_SUPER_ADMIN) {
+                alert("Asosiy yaratuvchi adminni o'chirib bo'lmaydi!");
+                return;
+            }
+            if(confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
+                admins = admins.filter(x => x !== email);
+                localStorage.setItem("m84_admins", JSON.stringify(admins));
+                renderAdmins();
+            }
+        }
+
+        function renderAdmins() {
+            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
+            const admins = getAdmins();
+            document.getElementById("admin-count").innerText = admins.length + " ta";
+            const tbody = document.getElementById("admins-list");
+            tbody.innerHTML = "";
+            admins.forEach((adm, i) => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30">
+                        <td class="py-3 px-3 text-gray-500">${i+1}</td>
+                        <td class="py-3 px-3 font-medium text-white">${adm} ${adm === MAIN_SUPER_ADMIN ? '<span class="text-xs bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded ml-2">Asosiy (Siz)</span>' : ''}</td>
+                        <td class="py-3 px-3 text-right">
+                            ${adm !== MAIN_SUPER_ADMIN ? `<button onclick="deleteAdmin('${adm}')" class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs">O'chirish</button>` : '<span class="text-xs text-gray-500">O\'chirib bo\'lmaydi</span>'}
+                        </td>
+                    </tr>`;
             });
         }
     </script>
