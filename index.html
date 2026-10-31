@@ -284,7 +284,22 @@
             { id: 3, name: "Sultonmurodov Erkin Abdug`aniyevich", subject: "Matematika o‘qituvchisi", badge: "Oliy toifa", bio: "Matematika o'qituvchisi" },
             { id: 4, name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o‘qituvchisi", badge: "1-toifa", bio: "Informatika o'qituvchisi" }
         ];
+async function isAuthorizedAdmin(email) {
+            if (email === MAIN_SUPER_ADMIN) return true;
+            if (!supabaseClient) return false;
 
+            try {
+                const { data, error } = await supabaseClient
+                    .from('admins')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+
+                return data ? true : false;
+            } catch (e) {
+                return false;
+            }
+        }
         window.onload = async function() {
             if (!localStorage.getItem("m84_teachers")) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
