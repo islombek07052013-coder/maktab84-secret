@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-gray-100 min-h-screen flex flex-col justify-between font-sans">
 
@@ -84,7 +85,6 @@
                 <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-images"></i> Xonalar
                 </button>
-                <!-- Faqat asosiy adminga ko'rinadigan Adminlar bo'limi -->
                 <button onclick="switchTab('admins')" id="tab-admins" class="tab-btn hidden bg-slate-800 text-gray-400 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-slate-700/50 flex items-center gap-2">
                     <i class="fa-solid fa-user-gear"></i> Adminlar
                 </button>
@@ -232,7 +232,7 @@
                 </div>
             </section>
 
-            <!-- SECTION 5: ADMINLARNI BOSHQARISH (Faqat Asosiy Adminga ko'rinadi) -->
+            <!-- SECTION 5: ADMINLARNI BOSHQARISH -->
             <section id="sec-admins" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700/60">
                     <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-user-plus text-blue-400"></i> Yangi Admin Qo'shish</h3>
@@ -240,7 +240,6 @@
                         <div>
                             <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Google Pochta (Email)</label>
                             <input type="email" id="admin-email-input" required placeholder="ustoz@gmail.com" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm text-white outline-none focus:border-blue-500">
-                            <p class="text-[11px] text-gray-400 mt-1">Shu pochtaga ega o'qituvchi faqat ma'lumotlarni o'zgartira oladi, lekin boshqa admin qo'sholmaydi.</p>
                         </div>
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30">Adminni Qo'shish</button>
                     </form>
@@ -270,7 +269,15 @@
 
     <script>
         const MAIN_SUPER_ADMIN = "islombek07052013@gmail.com";
+        const SUPABASE_URL = 'https://erurfkbqnwzpieantvm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVydXJma2Jxbnd6cGllYW50dm0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTYyNzQyMTE5LCJleHAiOjE5Nzk5OTcxMTl9.k8K62Q4p9a3C5s8xW7v1t0m6n2p4q5r8s9t0u1v2w3x';
+        
+        let supabaseClient = null;
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
 
+        // Ustozlarning asl ro'yxati shu yerda to'liq saqlanadi
         const initialTeachers = [
             { id: 1, name: "Yo‘ldosheva Madina Hasanovna", subject: "Psixolog", badge: "Mutaxassis", bio: "Maktab psixologi" },
             { id: 2, name: "Ismailova Dildora Chorievna", subject: "Ona tili va adabiyoti o‘qituvchisi", badge: "1-toifa", bio: "Ona tili o'qituvchisi" },
@@ -278,39 +285,48 @@
             { id: 4, name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o‘qituvchisi", badge: "1-toifa", bio: "Informatika o'qituvchisi" }
         ];
 
-        window.onload = function() {
+        window.onload = async function() {
             if (!localStorage.getItem("m84_teachers")) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
             }
-            // Bazaviy adminlar ro'yxatida faqat siz bo'lasiz
-            if (!localStorage.getItem("m84_admins")) {
-                localStorage.setItem("m84_admins", JSON.stringify([MAIN_SUPER_ADMIN]));
-            }
 
             const currentLogged = localStorage.getItem("admin_email");
-            if (currentLogged && isAuthorizedAdmin(currentLogged)) {
-                showDashboard(currentLogged);
+            if (currentLogged) {
+                const authorized = await isAuthorizedAdmin(currentLogged);
+                if (authorized) {
+                    showDashboard(currentLogged);
+                } else {
+                    localStorage.removeItem("admin_email");
+                }
             }
             populateClasses();
             loadSchoolName();
             loadTimesToAdmin();
         }
 
-        function getAdmins() {
-            return JSON.parse(localStorage.getItem("m84_admins") || `["${MAIN_SUPER_ADMIN}"]`);
+        async function isAuthorizedAdmin(email) {
+            if (email === MAIN_SUPER_ADMIN) return true;
+            if (!supabaseClient) return false;
+
+            const { data, error } = await supabaseClient
+                .from('admins')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            return data ? true : false;
         }
 
-        function isAuthorizedAdmin(email) {
-            const admins = getAdmins();
-            return admins.includes(email);
-        }
-
-        function handleCredentialResponse(response) {
+        async function handleCredentialResponse(response) {
             try {
                 const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-                if (isAuthorizedAdmin(payload.email)) {
-                    localStorage.setItem("admin_email", payload.email);
-                    showDashboard(payload.email);
+                const email = payload.email;
+
+                const authorized = await isAuthorizedAdmin(email);
+
+                if (authorized) {
+                    localStorage.setItem("admin_email", email);
+                    showDashboard(email);
                 } else {
                     document.getElementById("error-msg").classList.remove("hidden");
                 }
@@ -321,7 +337,6 @@
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("admin-dashboard").classList.remove("hidden");
 
-            // Faqat asosiy adminga "Adminlar" bo'limini ko'rsatish
             if (email === MAIN_SUPER_ADMIN) {
                 document.getElementById("tab-admins").classList.remove("hidden");
                 document.getElementById("admin-role-label").innerText = "Asosiy Boshqaruv Paneli (Super Admin)";
@@ -440,135 +455,160 @@
             list.push({ id: Date.now(), class_name, day, lessons: lessonsFormatted });
             localStorage.setItem("school_schedules_v3", JSON.stringify(list));
             renderSchedule(); e.target.reset();
-            alert("Jadval saqlandi!");
+            alert("Dars jadvali saqlandi!");
         }
+
         function deleteSchedule(id) {
-            if(confirm("O'chirmoqchimisiz?")) {
+            if(confirm("Jadvalni o'chirmoqchimisiz?")) {
                 localStorage.setItem("school_schedules_v3", JSON.stringify(getSchedule().filter(x => x.id !== id)));
                 renderSchedule();
             }
         }
+
         function renderSchedule() {
             const list = getSchedule();
             document.getElementById("s-count").innerText = list.length + " ta";
-            const box = document.getElementById("schedule-list");
-            box.innerHTML = list.length ? "" : `<div class="col-span-full text-center py-6 text-gray-500">Jadvallar yo'q</div>`;
+            const container = document.getElementById("schedule-list");
+            container.innerHTML = list.length ? "" : `<p class="text-gray-500 text-center col-span-2 py-6">Jadvallar kiritilmagan</p>`;
+            
             list.forEach(s => {
-                box.innerHTML += `
-                    <div class="border border-slate-700 bg-slate-900/60 p-4 rounded-xl relative">
-                        <button onclick="deleteSchedule(${s.id})" class="absolute top-3 right-3 text-red-400 text-xs bg-red-500/10 p-1.5 rounded-md"><i class="fa-solid fa-trash"></i></button>
-                        <div class="font-bold text-blue-400 text-base mb-1">${s.class_name}</div>
-                        <div class="text-xs text-gray-400 mb-2">${s.day}</div>
-                        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-sans bg-slate-800 p-3 rounded-lg">${s.lessons}</pre>
+                container.innerHTML += `
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 relative group">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="bg-blue-600/20 text-blue-400 text-xs px-2.5 py-1 rounded-md font-bold">${s.class_name}</span>
+                                <span class="text-xs text-gray-400 ml-2 font-semibold">${s.day}</span>
+                            </div>
+                            <button onclick="deleteSchedule(${s.id})" class="text-red-400 hover:text-red-300 text-xs bg-red-950/40 p-1.5 rounded-lg border border-red-900/50"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-sans mt-2 bg-slate-800/50 p-2.5 rounded-lg">${s.lessons}</pre>
                     </div>`;
             });
         }
 
-        // --- IKKI SMENA VAQTLARI ---
+        // --- DARS VAQTLARI ---
+        function loadTimesToAdmin() {
+            let t1 = JSON.parse(localStorage.getItem("m84_shift1")) || ["08:00 – 08:45","08:50 – 09:35","09:40 – 10:25","10:30 – 11:15","11:20 – 12:05","12:10 – 12:55"];
+            let t2 = JSON.parse(localStorage.getItem("m84_shift2")) || ["13:05 – 13:50","13:55 – 14:40","14:45 – 15:30","15:35 – 16:20","16:25 – 17:10","17:15 – 18:00"];
+            
+            t1.forEach((val, idx) => { if(document.getElementById(`s1-${idx}`)) document.getElementById(`s1-${idx}`).value = val; });
+            t2.forEach((val, idx) => { if(document.getElementById(`s2-${idx}`)) document.getElementById(`s2-${idx}`).value = val; });
+        }
+
         function saveLessonTimes(e) {
             e.preventDefault();
-            let s1 = [], s2 = [];
+            let t1 = [], t2 = [];
             for(let i=0; i<6; i++) {
-                s1.push(document.getElementById("s1-" + i).value);
-                s2.push(document.getElementById("s2-" + i).value);
+                t1.push(document.getElementById(`s1-${i}`).value);
+                t2.push(document.getElementById(`s2-${i}`).value);
             }
-            localStorage.setItem("m84_s1_times", JSON.stringify(s1));
-            localStorage.setItem("m84_s2_times", JSON.stringify(s2));
-            alert("Vaqtlar saqlandi!");
+            localStorage.setItem("m84_shift1", JSON.stringify(t1));
+            localStorage.setItem("m84_shift2", JSON.stringify(t2));
+            alert("Dars vaqtlari muvaffaqiyatli saqlandi!");
         }
 
-        function loadTimesToAdmin() {
-            let s1 = JSON.parse(localStorage.getItem("m84_s1_times") || "null");
-            let s2 = JSON.parse(localStorage.getItem("m84_s2_times") || "null");
-            if(!s1) s1 = ["08:00 – 08:45", "08:50 – 09:35", "09:40 – 10:25", "10:30 – 11:15", "11:20 – 12:05", "12:10 – 12:55"];
-            if(!s2) s2 = ["13:05 – 13:50", "13:55 – 14:40", "14:45 – 15:30", "15:35 – 16:20", "16:25 – 17:10", "17:15 – 18:00"];
-            s1.forEach((t, i) => { let el = document.getElementById("s1-" + i); if(el) el.value = t; });
-            s2.forEach((t, i) => { let el = document.getElementById("s2-" + i); if(el) el.value = t; });
+        // --- XONALAR GALEREYASI ---
+        function getRooms() { 
+            return JSON.parse(localStorage.getItem("m84_rooms") || JSON.stringify([
+                { id: 1, title: "Fizika xonasi", images: ["https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600"] },
+                { id: 2, title: "Informatika xonasi", images: ["https://images.unsplash.com/photo-1562774053-701939374585?w=600"] }
+            ])); 
         }
 
-        // --- XONALAR ---
-        function getRooms() { return JSON.parse(localStorage.getItem("m84_rooms") || "[]"); }
         function addRoomImageByUrl(e) {
             e.preventDefault();
             const title = document.getElementById("r-title").value;
-            const imgSrc = document.getElementById("r-url").value;
-            if(imgSrc) {
-                const list = getRooms();
-                list.push({ id: Date.now(), title, imgSrc });
-                localStorage.setItem("m84_rooms", JSON.stringify(list));
-                renderRooms();
-                e.target.reset();
-                alert("Rasm havolasi muvaffaqiyatli qo'shildi!");
-            }
+            const url = document.getElementById("r-url").value;
+            let rooms = getRooms();
+            rooms.push({ id: Date.now(), title, images: [url] });
+            localStorage.setItem("m84_rooms", JSON.stringify(rooms));
+            renderRooms(); e.target.reset();
+            alert("Rasm qo'shildi!");
         }
+
         function deleteRoom(id) {
             if(confirm("O'chirmoqchimisiz?")) {
                 localStorage.setItem("m84_rooms", JSON.stringify(getRooms().filter(x => x.id !== id)));
                 renderRooms();
             }
         }
+
         function renderRooms() {
             const list = getRooms();
             document.getElementById("r-count").innerText = list.length + " ta";
-            const gallery = document.getElementById("rooms-gallery");
-            gallery.innerHTML = list.length ? "" : `<div class="col-span-full text-center py-6 text-gray-500">Rasmlar yo'q</div>`;
+            const container = document.getElementById("rooms-gallery");
+            container.innerHTML = list.length ? "" : `<p class="text-gray-500 text-center col-span-3 py-6">Rasmlar yo'q</p>`;
+            
             list.forEach(r => {
-                gallery.innerHTML += `
-                    <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-900 relative">
-                        <img src="${r.imgSrc}" class="w-full h-32 object-cover" onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600'">
-                        <div class="p-2.5 flex justify-between items-center text-xs text-gray-300">
-                            <span class="truncate">${r.title}</span>
-                            <button onclick="deleteRoom(${r.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                container.innerHTML += `
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 relative">
+                        <img src="${r.images[0]}" class="w-full h-28 object-cover rounded-lg mb-2">
+                        <h4 class="text-xs font-bold text-white truncate">${r.title}</h4>
+                        <button onclick="deleteRoom(${r.id})" class="absolute top-4 right-4 bg-red-600 text-white p-1.5 rounded-lg text-xs shadow"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
             });
         }
 
-        // --- ADMINLARNI BOSHQARISH (Faqat Asosiy Admin uchun) ---
-        function addAdmin(e) {
+        // --- ADMINLARNI SUPABASE ORQALI BOSHQARISH ---
+        async function addAdmin(e) {
             e.preventDefault();
-            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
-            const emailInput = document.getElementById("admin-email-input").value.trim().toLowerCase();
-            if(!emailInput) return;
-            const admins = getAdmins();
-            if(admins.includes(emailInput)) {
-                alert("Bu pochta allaqachon admin sifatida qo'shilgan!");
+            const email = document.getElementById("admin-email-input").value.trim().toLowerCase();
+            
+            if (!supabaseClient) {
+                alert("Supabase ulanmagan!");
                 return;
             }
-            admins.push(emailInput);
-            localStorage.setItem("m84_admins", JSON.stringify(admins));
-            renderAdmins();
-            e.target.reset();
-            alert("Yangi admin muvaffaqiyatli qo'shildi!");
+
+            const { error } = await supabaseClient.from('admins').insert([{ email }]);
+            if (error) {
+                alert("Xatolik: Bu pochta allaqachon mavjud yoki xato! (" + error.message + ")");
+            } else {
+                alert("Yangi admin muvaffaqiyatli qo'shildi!");
+                renderAdmins();
+                e.target.reset();
+            }
         }
 
-        function deleteAdmin(email) {
-            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
-            let admins = getAdmins();
+        async function removeAdmin(email) {
             if(email === MAIN_SUPER_ADMIN) {
-                alert("Asosiy yaratuvchi adminni o'chirib bo'lmaydi!");
+                alert("Asosiy super adminni o'chirib bo'lmaydi!");
                 return;
             }
             if(confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
-                admins = admins.filter(x => x !== email);
-                localStorage.setItem("m84_admins", JSON.stringify(admins));
-                renderAdmins();
+                const { error } = await supabaseClient.from('admins').delete().eq('email', email);
+                if (error) {
+                    alert("O'chirishda xatolik: " + error.message);
+                } else {
+                    renderAdmins();
+                }
             }
         }
 
-        function renderAdmins() {
-            if(localStorage.getItem("admin_email") !== MAIN_SUPER_ADMIN) return;
-            const admins = getAdmins();
-            document.getElementById("admin-count").innerText = admins.length + " ta";
+        async function renderAdmins() {
+            if (!supabaseClient) return;
+            const { data: admins, error } = await supabaseClient.from('admins').select('*');
+            if (error) return;
+
+            let allAdmins = [{ email: MAIN_SUPER_ADMIN }];
+            if (admins) {
+                admins.forEach(a => {
+                    if (a.email !== MAIN_SUPER_ADMIN) allAdmins.push(a);
+                });
+            }
+
+            document.getElementById("admin-count").innerText = allAdmins.length + " ta";
             const tbody = document.getElementById("admins-list");
             tbody.innerHTML = "";
-            admins.forEach((adm, i) => {
+            
+            allAdmins.forEach((adm, i) => {
+                const email = adm.email;
+                const isSuper = email === MAIN_SUPER_ADMIN;
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30">
                         <td class="py-3 px-3 text-gray-500">${i+1}</td>
-                        <td class="py-3 px-3 font-medium text-white">${adm} ${adm === MAIN_SUPER_ADMIN ? '<span class="text-xs bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded ml-2">Asosiy (Siz)</span>' : ''}</td>
+                        <td class="py-3 px-3 font-medium text-white">${email} ${isSuper ? '<span class="bg-blue-600/20 text-blue-400 text-[10px] px-2 py-0.5 rounded ml-2">Super Admin</span>' : ''}</td>
                         <td class="py-3 px-3 text-right">
-                            ${adm !== MAIN_SUPER_ADMIN ? `<button onclick="deleteAdmin('${adm}')" class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs">O'chirish</button>` : '<span class="text-xs text-gray-500">O\'chirib bo\'lmaydi</span>'}
+                            ${isSuper ? '<span class="text-gray-500 text-xs">O\'chirib bo\'lmaydi</span>' : `<button onclick="removeAdmin('${email}')" class="bg-red-500/10 text-red-400 px-2.5 py-1 rounded text-xs">O'chirish</button>`}
                         </td>
                     </tr>`;
             });
