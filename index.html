@@ -277,14 +277,14 @@
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
 
-        // Ustozlarning asl ro'yxati shu yerda to'liq saqlanadi
         const initialTeachers = [
             { id: 1, name: "Yo‘ldosheva Madina Hasanovna", subject: "Psixolog", badge: "Mutaxassis", bio: "Maktab psixologi" },
             { id: 2, name: "Ismailova Dildora Chorievna", subject: "Ona tili va adabiyoti o‘qituvchisi", badge: "1-toifa", bio: "Ona tili o'qituvchisi" },
             { id: 3, name: "Sultonmurodov Erkin Abdug`aniyevich", subject: "Matematika o‘qituvchisi", badge: "Oliy toifa", bio: "Matematika o'qituvchisi" },
             { id: 4, name: "Xujamkulov Shavkat Uralovich", subject: "Informatika o‘qituvchisi", badge: "1-toifa", bio: "Informatika o'qituvchisi" }
         ];
-async function isAuthorizedAdmin(email) {
+
+        async function isAuthorizedAdmin(email) {
             if (email === MAIN_SUPER_ADMIN) return true;
             if (!supabaseClient) return false;
 
@@ -300,6 +300,7 @@ async function isAuthorizedAdmin(email) {
                 return false;
             }
         }
+
         window.onload = async function() {
             if (!localStorage.getItem("m84_teachers")) {
                 localStorage.setItem("m84_teachers", JSON.stringify(initialTeachers));
@@ -317,19 +318,6 @@ async function isAuthorizedAdmin(email) {
             populateClasses();
             loadSchoolName();
             loadTimesToAdmin();
-        }
-
-        async function isAuthorizedAdmin(email) {
-            if (email === MAIN_SUPER_ADMIN) return true;
-            if (!supabaseClient) return false;
-
-            const { data, error } = await supabaseClient
-                .from('admins')
-                .select('*')
-                .eq('email', email)
-                .single();
-
-            return data ? true : false;
         }
 
         async function handleCredentialResponse(response) {
@@ -563,7 +551,8 @@ async function isAuthorizedAdmin(email) {
                     </div>`;
             });
         }
-// --- ADMINLARNI SUPABASE ORQALI BOSHQARISH ---
+
+        // --- ADMINLARNI SUPABASE ORQALI BOSHQARISH ---
         async function addAdmin(e) {
             e.preventDefault();
             const email = document.getElementById("admin-email-input").value.trim().toLowerCase();
@@ -584,11 +573,11 @@ async function isAuthorizedAdmin(email) {
         }
 
         async function removeAdmin(email) {
-            if (email === MAIN_SUPER_ADMIN) {
+            if(email === MAIN_SUPER_ADMIN) {
                 alert("Asosiy super adminni o'chirib bo'lmaydi!");
                 return;
             }
-            if (confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
+            if(confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
                 const { error } = await supabaseClient.from('admins').delete().eq('email', email);
                 if (error) {
                     alert("O'chirishda xatolik: " + error.message);
@@ -600,12 +589,8 @@ async function isAuthorizedAdmin(email) {
 
         async function renderAdmins() {
             if (!supabaseClient) return;
-            
             const { data: admins, error } = await supabaseClient.from('admins').select('*');
-            if (error) {
-                console.error("Adminlarni olishda xatolik:", error);
-                return;
-            }
+            if (error) return;
 
             let allAdmins = [{ email: MAIN_SUPER_ADMIN }];
             if (admins) {
@@ -634,3 +619,6 @@ async function isAuthorizedAdmin(email) {
                     </tr>`;
             });
         }
+    </script>
+</body>
+</html>
