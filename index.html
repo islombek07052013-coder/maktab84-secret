@@ -548,8 +548,7 @@
                     </div>`;
             });
         }
-
-        // --- ADMINLARNI SUPABASE ORQALI BOSHQARISH ---
+// --- ADMINLARNI SUPABASE ORQALI BOSHQARISH ---
         async function addAdmin(e) {
             e.preventDefault();
             const email = document.getElementById("admin-email-input").value.trim().toLowerCase();
@@ -570,11 +569,11 @@
         }
 
         async function removeAdmin(email) {
-            if(email === MAIN_SUPER_ADMIN) {
+            if (email === MAIN_SUPER_ADMIN) {
                 alert("Asosiy super adminni o'chirib bo'lmaydi!");
                 return;
             }
-            if(confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
+            if (confirm(`${email} ni adminlikdan o'chirmoqchimisiz?`)) {
                 const { error } = await supabaseClient.from('admins').delete().eq('email', email);
                 if (error) {
                     alert("O'chirishda xatolik: " + error.message);
@@ -586,13 +585,20 @@
 
         async function renderAdmins() {
             if (!supabaseClient) return;
+            
             const { data: admins, error } = await supabaseClient.from('admins').select('*');
-            if (error) return;
+            if (error) {
+                console.error("Adminlarni olishda xatolik:", error);
+                return;
+            }
 
             let allAdmins = [{ email: MAIN_SUPER_ADMIN }];
             if (admins) {
                 admins.forEach(a => {
-                    if (a.email !== MAIN_SUPER_ADMIN) allAdmins.push(a);
+                    const adminEmail = a.email || a.username;
+                    if (adminEmail && adminEmail !== MAIN_SUPER_ADMIN) {
+                        allAdmins.push({ email: adminEmail });
+                    }
                 });
             }
 
@@ -613,6 +619,3 @@
                     </tr>`;
             });
         }
-    </script>
-</body>
-</html>
